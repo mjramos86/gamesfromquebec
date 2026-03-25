@@ -1,6 +1,6 @@
 // ===============================
-// JOBS SYSTEM — RSS VERSION
-// Québec Game Industry Only
+// JOBS SYSTEM — Remotive API
+// Game Dev Jobs
 // ===============================
 
 let jobsData = [];
@@ -68,7 +68,6 @@ function esc(s) {
 
 function dedupeJobs(jobs) {
   const seen = new Set();
-
   return jobs.filter(j => {
     const key = j.title + j.company;
     if (seen.has(key)) return false;
@@ -111,17 +110,12 @@ function getFilteredJobs() {
   }
 
   if (currentTypeFilter !== 'all') {
-    const typeMap = {
-      full_time: ['programmer', 'developer', 'artist', 'designer', 'producer', 'audio'],
-      part_time: ['part'],
-      contract: ['contract', 'freelance'],
-      internship: ['intern', 'stage', 'internship']
-    };
-    const keywords = typeMap[currentTypeFilter] || [];
-    if (keywords.length) {
+    if (currentTypeFilter === 'internship') {
       jobs = jobs.filter(j =>
-        keywords.some(k => j.title.toLowerCase().includes(k) || j.snippet.toLowerCase().includes(k))
+        (j.title + ' ' + j.snippet).toLowerCase().includes('intern')
       );
+    } else {
+      jobs = jobs.filter(j => j.jobType === currentTypeFilter);
     }
   }
 
@@ -129,23 +123,23 @@ function getFilteredJobs() {
 }
 
 // ===============================
-// RSS FETCH
+// REMOTIVE API FETCH
 // ===============================
 
-async function fetchRSS(url) {
+async function fetchRemotive(category) {
   const res = await fetch(
-    `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`
+    `https://remotive.com/api/remote-jobs?category=${encodeURIComponent(category)}&limit=100`
   );
-
   const data = await res.json();
 
-  return (data.items || []).map(item => ({
+  return (data.jobs || []).map(item => ({
     title: item.title,
-    company: item.author || 'Studio',
-    location: 'Québec',
+    company: item.company_name,
+    location: item.candidate_required_location || 'Remote',
     snippet: cleanHTML(item.description).slice(0, 160),
-    url: item.link,
-    posted: item.pubDate
+    url: item.url,
+    posted: item.publication_date,
+    jobType: item.job_type
   }));
 }
 
@@ -169,29 +163,19 @@ async function runSearch() {
   container.innerHTML = `
     <div class="loading-state">
       <div class="spinner"></div>
-      <div class="loading-text">Scanning Québec game jobs…</div>
+      <div class="loading-text">Loading game dev jobs…</div>
     </div>
   `;
 
   try {
-    const feeds = [
-      'https://rss.indeed.com/rss?q=video+game&l=Quebec',
-      'https://rss.indeed.com/rss?q=unity+developer&l=Montreal',
-      'https://rss.indeed.com/rss?q=game+designer&l=Montreal',
-      'https://rss.indeed.com/rss?q=unreal+developer&l=Quebec'
-    ];
+    const [gameJobs, devJobs] = await Promise.all([
+      fetchRemotive('game-development'),
+      fetchRemotive('software-dev')
+    ]);
 
-    let allJobs = [];
+    let allJobs = [...gameJobs, ...devJobs];
 
-    for (const feed of feeds) {
-      const jobs = await fetchRSS(feed);
-      allJobs.push(...jobs);
-    }
-
-    let filtered = allJobs.filter(j =>
-      isGameJob(j.title, j.snippet)
-    );
-
+    let filtered = allJobs.filter(j => isGameJob(j.title, j.snippet));
     filtered = dedupeJobs(filtered);
 
     jobsData = filtered;
@@ -239,7 +223,7 @@ function renderJobs() {
   }
 
   container.innerHTML = jobs.map(job => {
-    const isNew = /hour|today/i.test(job.posted);
+    const isNew = /hour|today|\d{4}-\d{2}-\d{2}/i.test(job.posted);
     const role = detectRole(job.title);
     const studioType = detectStudioType(job.company);
 
@@ -248,7 +232,7 @@ function renderJobs() {
         <div>
           <div class="job-header">
             <div class="job-studio-logo">
-              ${esc(job.company.slice(0,2).toUpperCase())}
+              ${esc(job.company.slice(0, 2).toUpperCase())}
             </div>
 
             <div>
@@ -269,7 +253,7 @@ function renderJobs() {
         </div>
 
         <div class="job-right">
-          <div class="job-age">${esc(job.posted || '')}</div>
+          <div class="job-age">${esc(job.posted ? job.posted.slice(0, 10) : '')}</div>
           <a class="apply-btn" href="${esc(job.url)}" target="_blank" rel="noopener noreferrer">
             Apply
           </a>
@@ -307,10 +291,3 @@ function renderLoadMore(filtered) {
     renderJobs();
   };
 }
-
-// ===============================
-// AUTO INIT (OPTIONAL)
-// ===============================
-
-// Call this when jobs page loads
-// runSearch();
