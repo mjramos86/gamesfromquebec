@@ -103,8 +103,13 @@ async function fetchGoogleJobs(query, location) {
     api_key: SERPAPI_KEY
   });
 
-  const serpUrl = `https://serpapi.com/search.json?${params}`;
-  const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(serpUrl)}`);
+  const res = await fetch(`https://serpapi.com/search.json?${params}`);
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+
   const data = await res.json();
 
   if (data.error) throw new Error(data.error);
@@ -114,7 +119,7 @@ async function fetchGoogleJobs(query, location) {
     company: item.company_name,
     location: item.location,
     snippet: (item.description || '').slice(0, 160),
-    url: item.related_links?.[0]?.link || '#',
+    url: item.apply_options?.[0]?.link || item.related_links?.[0]?.link || '#',
     posted: item.detected_extensions?.posted_at || '',
     jobType: item.detected_extensions?.schedule_type || '',
     salary: item.detected_extensions?.salary || ''
