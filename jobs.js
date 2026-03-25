@@ -119,7 +119,7 @@ async function fetchGoogleJobs(query, location) {
     company: item.company_name,
     location: item.location,
     snippet: (item.description || '').slice(0, 160),
-    url: item.related_links?.[0]?.link || '#',
+    url: item.apply_options?.[0]?.link || item.related_links?.[0]?.link || '#',
     posted: item.detected_extensions?.posted_at || '',
     jobType: item.detected_extensions?.schedule_type || '',
     salary: item.detected_extensions?.salary || ''
