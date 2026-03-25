@@ -3,7 +3,7 @@
 // Québec Game Industry
 // ===============================
 
-const SERPAPI_KEY = 'YOUR_SERPAPI_KEY';
+const SERPAPI_KEY = '2064428fbfcef11c8812ffee6019cf7ca311119dc304c2d4854106da25e65a47';
 
 let jobsData = [];
 let jobsLoading = false;
