@@ -1,7 +1,9 @@
 // ===============================
-// JOBS SYSTEM — Remotive API
-// Game Dev Jobs
+// JOBS SYSTEM — SerpApi Google Jobs
+// Québec Game Industry
 // ===============================
+
+const SERPAPI_KEY = 'YOUR_SERPAPI_KEY';
 
 let jobsData = [];
 let jobsLoading = false;
@@ -12,12 +14,6 @@ let currentKeywordFilter = '';
 // ===============================
 // CONFIG
 // ===============================
-
-const GAME_KEYWORDS = [
-  'game','gaming','video game','unity','unreal','level design',
-  'gameplay','3d artist','game designer','game programmer',
-  'qa tester','engine','technical artist'
-];
 
 const ROLE_TAGS = [
   { key: 'artist', label: '🎨 Artist' },
@@ -31,17 +27,12 @@ const ROLE_TAGS = [
 ];
 
 const AAA_STUDIOS = [
-  'ubisoft','warner','eidos','behaviour','ea','gameloft'
+  'ubisoft', 'warner', 'eidos', 'behaviour', 'ea', 'gameloft'
 ];
 
 // ===============================
 // HELPERS
 // ===============================
-
-function isGameJob(title, snippet) {
-  const text = `${title} ${snippet}`.toLowerCase();
-  return GAME_KEYWORDS.some(k => text.includes(k));
-}
 
 function detectRole(title) {
   const t = title.toLowerCase();
@@ -54,26 +45,12 @@ function detectStudioType(company) {
   return AAA_STUDIOS.some(s => c.includes(s)) ? 'AAA' : 'Indie';
 }
 
-function cleanHTML(html) {
-  return html.replace(/<[^>]+>/g, '');
-}
-
 function esc(s) {
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-}
-
-function dedupeJobs(jobs) {
-  const seen = new Set();
-  return jobs.filter(j => {
-    const key = j.title + j.company;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
 }
 
 // ===============================
@@ -89,33 +66,24 @@ function setTypeFilter(btn, type) {
 }
 
 function quickSearch(q) {
-  currentKeywordFilter = q.toLowerCase();
   const input = document.getElementById('keywordsInput');
   if (input) input.value = q;
-  visibleJobs = 12;
-  if (jobsData.length === 0) {
-    runSearch();
-  } else {
-    renderJobs();
-  }
+  runSearch();
 }
 
 function getFilteredJobs() {
   let jobs = jobsData;
 
-  if (currentKeywordFilter) {
-    jobs = jobs.filter(j =>
-      (j.title + ' ' + j.snippet).toLowerCase().includes(currentKeywordFilter)
-    );
-  }
-
   if (currentTypeFilter !== 'all') {
-    if (currentTypeFilter === 'internship') {
-      jobs = jobs.filter(j =>
-        (j.title + ' ' + j.snippet).toLowerCase().includes('intern')
-      );
-    } else {
-      jobs = jobs.filter(j => j.jobType === currentTypeFilter);
+    const typeMap = {
+      full_time: 'full-time',
+      part_time: 'part-time',
+      contract: 'contractor',
+      internship: 'internship'
+    };
+    const match = typeMap[currentTypeFilter];
+    if (match) {
+      jobs = jobs.filter(j => j.jobType.toLowerCase().includes(match));
     }
   }
 
@@ -123,23 +91,32 @@ function getFilteredJobs() {
 }
 
 // ===============================
-// REMOTIVE API FETCH
+// GOOGLE JOBS FETCH (SerpApi)
 // ===============================
 
-async function fetchRemotive(category) {
-  const res = await fetch(
-    `https://remotive.com/api/remote-jobs?category=${encodeURIComponent(category)}&limit=100`
-  );
+async function fetchGoogleJobs(query, location) {
+  const params = new URLSearchParams({
+    engine: 'google_jobs',
+    q: query,
+    location: location || 'Quebec, Canada',
+    hl: 'en',
+    api_key: SERPAPI_KEY
+  });
+
+  const res = await fetch(`https://serpapi.com/search.json?${params}`);
   const data = await res.json();
 
-  return (data.jobs || []).map(item => ({
+  if (data.error) throw new Error(data.error);
+
+  return (data.jobs_results || []).map(item => ({
     title: item.title,
     company: item.company_name,
-    location: item.candidate_required_location || 'Remote',
-    snippet: cleanHTML(item.description).slice(0, 160),
-    url: item.url,
-    posted: item.publication_date,
-    jobType: item.job_type
+    location: item.location,
+    snippet: (item.description || '').slice(0, 160),
+    url: item.related_links?.[0]?.link || '#',
+    posted: item.detected_extensions?.posted_at || '',
+    jobType: item.detected_extensions?.schedule_type || '',
+    salary: item.detected_extensions?.salary || ''
   }));
 }
 
@@ -152,41 +129,32 @@ async function runSearch() {
 
   const container = document.getElementById('jobsContainer');
   const keywordsInput = document.getElementById('keywordsInput');
-  if (keywordsInput && keywordsInput.value.trim()) {
-    currentKeywordFilter = keywordsInput.value.trim().toLowerCase();
-  } else {
-    currentKeywordFilter = '';
-  }
+  const locationInput = document.getElementById('locationInput');
+
+  const query = keywordsInput?.value.trim() || 'video game';
+  const location = locationInput?.value.trim() || 'Quebec, Canada';
 
   jobsLoading = true;
+  currentTypeFilter = 'all';
+  document.querySelectorAll('#typeFilters .filter-chip').forEach((b, i) => {
+    b.classList.toggle('active', i === 0);
+  });
 
   container.innerHTML = `
     <div class="loading-state">
       <div class="spinner"></div>
-      <div class="loading-text">Loading game dev jobs…</div>
+      <div class="loading-text">Scanning Québec game jobs…</div>
     </div>
   `;
 
   try {
-    const [gameJobs, devJobs] = await Promise.all([
-      fetchRemotive('game-development'),
-      fetchRemotive('software-dev')
-    ]);
-
-    let allJobs = [...gameJobs, ...devJobs];
-
-    let filtered = allJobs.filter(j => isGameJob(j.title, j.snippet));
-    filtered = dedupeJobs(filtered);
-
-    jobsData = filtered;
+    jobsData = await fetchGoogleJobs(query, location);
     visibleJobs = 12;
-
     renderJobs();
-
   } catch (err) {
     container.innerHTML = `
       <div class="error-state">
-        Connection error: ${err.message}
+        Connection error: ${esc(err.message)}
       </div>
     `;
   }
@@ -215,7 +183,7 @@ function renderJobs() {
       <div class="empty-state">
         <div class="empty-icon">🎮</div>
         <div class="empty-title">NO JOBS FOUND</div>
-        <p class="empty-sub">Try again later</p>
+        <p class="empty-sub">Try a different search or check back later</p>
       </div>
     `;
     renderLoadMore(filtered);
@@ -223,7 +191,6 @@ function renderJobs() {
   }
 
   container.innerHTML = jobs.map(job => {
-    const isNew = /hour|today|\d{4}-\d{2}-\d{2}/i.test(job.posted);
     const role = detectRole(job.title);
     const studioType = detectStudioType(job.company);
 
@@ -234,7 +201,6 @@ function renderJobs() {
             <div class="job-studio-logo">
               ${esc(job.company.slice(0, 2).toUpperCase())}
             </div>
-
             <div>
               <div class="job-title">${esc(job.title)}</div>
               <div class="job-company">
@@ -246,14 +212,15 @@ function renderJobs() {
           <div class="job-tags">
             <span class="job-tag type">${role}</span>
             <span class="job-tag">${studioType}</span>
-            ${isNew ? '<span class="job-tag new-tag">New</span>' : ''}
+            ${job.jobType ? `<span class="job-tag">${esc(job.jobType)}</span>` : ''}
+            ${job.salary ? `<span class="job-tag">💰 ${esc(job.salary)}</span>` : ''}
           </div>
 
           <div class="job-snippet">${esc(job.snippet)}</div>
         </div>
 
         <div class="job-right">
-          <div class="job-age">${esc(job.posted ? job.posted.slice(0, 10) : '')}</div>
+          <div class="job-age">${esc(job.posted)}</div>
           <a class="apply-btn" href="${esc(job.url)}" target="_blank" rel="noopener noreferrer">
             Apply
           </a>
