@@ -6,6 +6,8 @@
 let jobsData = [];
 let jobsLoading = false;
 let visibleJobs = 12;
+let currentTypeFilter = 'all';
+let currentKeywordFilter = '';
 
 // ===============================
 // CONFIG
@@ -56,6 +58,14 @@ function cleanHTML(html) {
   return html.replace(/<[^>]+>/g, '');
 }
 
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function dedupeJobs(jobs) {
   const seen = new Set();
 
@@ -65,6 +75,57 @@ function dedupeJobs(jobs) {
     seen.add(key);
     return true;
   });
+}
+
+// ===============================
+// FILTERS
+// ===============================
+
+function setTypeFilter(btn, type) {
+  currentTypeFilter = type;
+  document.querySelectorAll('#typeFilters .filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  visibleJobs = 12;
+  renderJobs();
+}
+
+function quickSearch(q) {
+  currentKeywordFilter = q.toLowerCase();
+  const input = document.getElementById('keywordsInput');
+  if (input) input.value = q;
+  visibleJobs = 12;
+  if (jobsData.length === 0) {
+    runSearch();
+  } else {
+    renderJobs();
+  }
+}
+
+function getFilteredJobs() {
+  let jobs = jobsData;
+
+  if (currentKeywordFilter) {
+    jobs = jobs.filter(j =>
+      (j.title + ' ' + j.snippet).toLowerCase().includes(currentKeywordFilter)
+    );
+  }
+
+  if (currentTypeFilter !== 'all') {
+    const typeMap = {
+      full_time: ['programmer', 'developer', 'artist', 'designer', 'producer', 'audio'],
+      part_time: ['part'],
+      contract: ['contract', 'freelance'],
+      internship: ['intern', 'stage', 'internship']
+    };
+    const keywords = typeMap[currentTypeFilter] || [];
+    if (keywords.length) {
+      jobs = jobs.filter(j =>
+        keywords.some(k => j.title.toLowerCase().includes(k) || j.snippet.toLowerCase().includes(k))
+      );
+    }
+  }
+
+  return jobs;
 }
 
 // ===============================
@@ -96,6 +157,12 @@ async function runSearch() {
   if (jobsLoading) return;
 
   const container = document.getElementById('jobsContainer');
+  const keywordsInput = document.getElementById('keywordsInput');
+  if (keywordsInput && keywordsInput.value.trim()) {
+    currentKeywordFilter = keywordsInput.value.trim().toLowerCase();
+  } else {
+    currentKeywordFilter = '';
+  }
 
   jobsLoading = true;
 
@@ -149,7 +216,15 @@ async function runSearch() {
 
 function renderJobs() {
   const container = document.getElementById('jobsContainer');
-  const jobs = jobsData.slice(0, visibleJobs);
+  const info = document.getElementById('resultsInfo');
+  const filtered = getFilteredJobs();
+  const jobs = filtered.slice(0, visibleJobs);
+
+  if (info) {
+    info.textContent = filtered.length
+      ? `${filtered.length} position${filtered.length !== 1 ? 's' : ''} found`
+      : 'No positions found';
+  }
 
   if (!jobs.length) {
     container.innerHTML = `
@@ -159,6 +234,7 @@ function renderJobs() {
         <p class="empty-sub">Try again later</p>
       </div>
     `;
+    renderLoadMore(filtered);
     return;
   }
 
@@ -172,13 +248,13 @@ function renderJobs() {
         <div>
           <div class="job-header">
             <div class="job-studio-logo">
-              ${job.company.slice(0,2).toUpperCase()}
+              ${esc(job.company.slice(0,2).toUpperCase())}
             </div>
 
             <div>
-              <div class="job-title">${job.title}</div>
+              <div class="job-title">${esc(job.title)}</div>
               <div class="job-company">
-                ${job.company} — ${job.location}
+                ${esc(job.company)} — ${esc(job.location)}
               </div>
             </div>
           </div>
@@ -189,12 +265,12 @@ function renderJobs() {
             ${isNew ? '<span class="job-tag new-tag">New</span>' : ''}
           </div>
 
-          <div class="job-snippet">${job.snippet}</div>
+          <div class="job-snippet">${esc(job.snippet)}</div>
         </div>
 
         <div class="job-right">
-          <div class="job-age">${job.posted || ''}</div>
-          <a class="apply-btn" href="${job.url}" target="_blank">
+          <div class="job-age">${esc(job.posted || '')}</div>
+          <a class="apply-btn" href="${esc(job.url)}" target="_blank" rel="noopener noreferrer">
             Apply
           </a>
         </div>
@@ -202,23 +278,28 @@ function renderJobs() {
     `;
   }).join('');
 
-  renderLoadMore();
+  renderLoadMore(filtered);
 }
 
 // ===============================
 // LOAD MORE
 // ===============================
 
-function renderLoadMore() {
+function renderLoadMore(filtered) {
   const btn = document.getElementById('loadMoreJobsBtn');
+  const wrap = document.getElementById('loadMoreJobsWrap');
 
   if (!btn) return;
 
-  if (visibleJobs >= jobsData.length) {
+  const jobs = filtered || getFilteredJobs();
+
+  if (visibleJobs >= jobs.length) {
+    if (wrap) wrap.style.display = 'none';
     btn.style.display = 'none';
     return;
   }
 
+  if (wrap) wrap.style.display = 'block';
   btn.style.display = 'inline-block';
 
   btn.onclick = () => {
