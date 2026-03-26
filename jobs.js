@@ -103,7 +103,8 @@ async function fetchGoogleJobs(query, location) {
     api_key: SERPAPI_KEY
   });
 
-  const res = await fetch(`https://serpapi.com/search.json?${params}`);
+  const serpUrl = `https://serpapi.com/search.json?${params}`;
+  const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(serpUrl)}`);
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
