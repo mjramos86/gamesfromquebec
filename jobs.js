@@ -94,47 +94,48 @@ function getFilteredJobs() {
 // GOOGLE JOBS FETCH (SerpApi)
 // ===============================
 
-async function fetchJobsPage(query, location, start) {
-  const params = new URLSearchParams({
-    engine: 'google_jobs',
-    q: query,
-    location: location || 'Quebec, Canada',
-    hl: 'en',
-    start: start,
-    api_key: SERPAPI_KEY
-  });
+async function fetchGoogleJobs(query, location) {
+  const results = [];
+  let nextPageToken = null;
 
-  const serpUrl = `https://serpapi.com/search.json?${params}`;
-  const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(serpUrl)}`);
+  for (let page = 0; page < 3; page++) {
+    const paramObj = {
+      engine: 'google_jobs',
+      q: query,
+      location: location || 'Quebec, Canada',
+      hl: 'en',
+      api_key: SERPAPI_KEY
+    };
+    if (nextPageToken) paramObj.next_page_token = nextPageToken;
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || `HTTP ${res.status}`);
+    const params = new URLSearchParams(paramObj);
+    const serpUrl = `https://serpapi.com/search.json?${params}`;
+    const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(serpUrl)}`);
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    results.push(...(data.jobs_results || []).map(item => ({
+      title: item.title,
+      company: item.company_name,
+      location: item.location,
+      snippet: (item.description || '').slice(0, 160),
+      url: item.apply_options?.[0]?.link || item.related_links?.[0]?.link || '#',
+      posted: item.detected_extensions?.posted_at || '',
+      jobType: item.detected_extensions?.schedule_type || '',
+      salary: item.detected_extensions?.salary || ''
+    })));
+
+    nextPageToken = data.serpapi_pagination?.next_page_token;
+    if (!nextPageToken) break;
   }
 
-  const data = await res.json();
-
-  if (data.error) throw new Error(data.error);
-
-  return (data.jobs_results || []).map(item => ({
-    title: item.title,
-    company: item.company_name,
-    location: item.location,
-    snippet: (item.description || '').slice(0, 160),
-    url: item.apply_options?.[0]?.link || item.related_links?.[0]?.link || '#',
-    posted: item.detected_extensions?.posted_at || '',
-    jobType: item.detected_extensions?.schedule_type || '',
-    salary: item.detected_extensions?.salary || ''
-  }));
-}
-
-async function fetchGoogleJobs(query, location) {
-  const pages = await Promise.all([
-    fetchJobsPage(query, location, 0),
-    fetchJobsPage(query, location, 10),
-    fetchJobsPage(query, location, 20)
-  ]);
-  return pages.flat();
+  return results;
 }
 
 // ===============================
