@@ -12,12 +12,13 @@
 ═══════════════════════════════════════════ */
 :root {
   --black:   #060810;
-  --surface: #0d1120;
-  --surface2:#141929;
+  --surface: #0c1020;
+  --surface2:#101525;
   --border:  rgba(255,255,255,0.06);
   --cyan:    #00e5ff;
   --rose:    #ff2d6d;
   --gold:    #ffc84a;
+  --blue:    #1a47ff;
   --text:    #e8eaf2;
   --muted:   #6b7280;
   --font-display: 'Bebas Neue', sans-serif;
@@ -45,99 +46,99 @@ nav {
   position:fixed;top:0;left:0;right:0;z-index:200;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 48px;height:64px;
-  background:rgba(6,8,16,0.88);
+  background:rgba(6,8,16,0.92);
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  transition: box-shadow 0.3s;
 }
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
-.nav-logo-text{font-family:var(--font-display);font-size:22px;letter-spacing:.05em;color:var(--text);}
-.nav-logo-text span{color:var(--cyan);}
-.nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
 .nav-links a{
   font-family:var(--font-ui);font-size:12px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;
-  color:var(--muted);text-decoration:none;transition:color .2s;cursor:pointer;
-  position:relative; padding-bottom:2px;
-}
-.nav-links a::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform .25s;
-}
-.nav-links a:hover{color:var(--text);}
-.nav-links a.active{color:var(--cyan);}
-.nav-links a.active::after{transform:scaleX(1);}
-.nav-right{display:flex;align-items:center;gap:12px;}
-.nav-jobs-btn{
-  font-family:var(--font-ui);font-size:11px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;
-  color:var(--black);background:var(--cyan);
-  border:none;padding:8px 18px;cursor:pointer;
-  display:inline-flex;align-items:center;gap:6px;
-  transition:all .2s;
-  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
+  color:var(--text);text-decoration:none;transition:color .2s;cursor:pointer;
 }
-.nav-jobs-btn:hover{background:white;box-shadow:0 0 28px rgba(0,229,255,.35);}
-.nav-jobs-btn svg{flex-shrink:0;}
+.nav-links a:hover{color:rgba(255,255,255,.7);}
+.nav-search{
+  display:flex;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;color:var(--text);
+  padding:8px;transition:color .2s;
+}
+.nav-search:hover{color:rgba(255,255,255,.6);}
+.nav-right{display:flex;align-items:center;gap:20px;}
 .nav-lang{
-  font-family:var(--font-ui);font-size:11px;font-weight:700;
+  font-family:var(--font-ui);font-size:12px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;
-  color:var(--cyan);text-decoration:none;
-  border:1px solid var(--cyan);padding:4px 12px;transition:all .2s;cursor:pointer;
+  color:var(--text);text-decoration:none;
+  background:none;border:none;cursor:pointer;transition:color .2s;
 }
-.nav-lang:hover{background:var(--cyan);color:var(--black);}
+.nav-lang:hover{color:rgba(255,255,255,.6);}
 
 /* ═══════════════════════════════════════════
-   HERO
+   HERO BANNER
 ═══════════════════════════════════════════ */
 .hero{
-  position:relative;min-height:100vh;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding:0 60px 80px;overflow:hidden;
+  position:relative;height:320px;margin-top:64px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
 }
 .hero-bg{
   position:absolute;inset:0;
   background:
-    radial-gradient(ellipse 70% 60% at 70% 40%,rgba(0,229,255,.07) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 50% at 20% 70%,rgba(255,45,109,.06) 0%,transparent 55%),
-    linear-gradient(180deg,#060810 0%,#0a0f1e 60%,#060810 100%);
+    /* sun glow top-center */
+    radial-gradient(ellipse 60% 55% at 55% 20%, rgba(255,185,60,.55) 0%, rgba(220,120,30,.3) 30%, transparent 65%),
+    /* warm sky band */
+    linear-gradient(180deg,
+      #2a1a08 0%,
+      #3d2510 8%,
+      #1e4a2a 28%,
+      #163a20 45%,
+      #0e2818 58%,
+      #081c2e 72%,
+      #060f1e 85%,
+      #050c18 100%
+    );
 }
-.hero-grid{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
-  background-size:60px 60px;
-  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 80%);
+/* Tree silhouette layer using pseudo-elements */
+.hero-bg::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(8,24,40,.9) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 20% at 30% 95%, rgba(10,30,20,.7) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 20% at 70% 95%, rgba(10,30,20,.7) 0%, transparent 60%);
 }
-.hero-featured{
-  position:absolute;top:64px;right:0;bottom:0;width:55%;
-  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;
-  opacity:.35;
-  mask-image:linear-gradient(to left,rgba(0,0,0,.8) 0%,transparent 90%),
-             linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.9) 90%);
+.hero-bg::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:40%;
+  background:linear-gradient(to top, rgba(6,8,16,.95) 0%, transparent 100%);
 }
-.hero-game-tile{background:var(--surface2);overflow:hidden;position:relative;}
-.hero-game-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(255,45,109,.1));}
-.tile-label{position:absolute;bottom:12px;left:12px;z-index:2;font-family:var(--font-display);font-size:18px;letter-spacing:.04em;color:white;text-shadow:0 0 20px rgba(0,229,255,.5);}
-.hero-eyebrow{
-  position:relative;font-family:var(--font-ui);font-size:11px;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);
-  margin-bottom:24px;display:flex;align-items:center;gap:12px;
+.hero-brand{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+  text-shadow: 0 2px 20px rgba(0,0,0,.8), 0 0 60px rgba(0,0,0,.5);
 }
-.hero-eyebrow::before{content:'';display:block;width:32px;height:1px;background:var(--cyan);}
-.hero-headline{
-  position:relative;font-family:var(--font-display);
-  font-size:clamp(64px,8vw,120px);line-height:.92;letter-spacing:-.01em;
-  color:var(--text);max-width:620px;margin-bottom:32px;
+.hero-brand-top{
+  font-family:var(--font-display);font-size:clamp(28px,4vw,48px);
+  letter-spacing:.22em;color:white;line-height:1;
+}
+.hero-brand-from{
+  font-family:var(--font-display);font-size:clamp(14px,2vw,22px);
+  letter-spacing:.35em;color:rgba(255,255,255,.85);line-height:1.2;
+  margin:2px 0;
+}
+.hero-brand-main{
+  font-family:var(--font-display);font-size:clamp(72px,10vw,148px);
+  letter-spacing:.04em;color:white;line-height:.88;
+}
+.hero-subtitle{
+  background:var(--black);
+  padding:20px 60px;
+  text-align:center;
+  font-family:var(--font-ui);font-size:11px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(232,234,242,.7);
+  border-bottom:1px solid var(--border);
 }
 .hl-cyan{color:var(--cyan);}
 .hl-rose{color:var(--rose);}
-.hero-desc{position:relative;max-width:440px;font-size:15px;font-weight:300;color:rgba(232,234,242,.65);margin-bottom:40px;}
-.hero-stats{position:relative;display:flex;gap:48px;margin-bottom:40px;}
-.stat-num{font-family:var(--font-display);font-size:48px;line-height:1;color:var(--text);letter-spacing:.02em;}
-.stat-num .accent{color:var(--rose);}
-.stat-label{font-family:var(--font-ui);font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
-.hero-cta{position:relative;display:flex;gap:16px;align-items:center;}
 .btn-primary{
   font-family:var(--font-ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
   text-decoration:none;color:var(--black);background:var(--cyan);
@@ -205,48 +206,80 @@ nav {
   clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
 }
 .filter-btn:hover{border-color:rgba(255,255,255,.15);color:var(--text);}
-.filter-btn.active{background:var(--cyan);border-color:var(--cyan);color:var(--black);}
-.games-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:2px;padding:0 60px;
+.filter-btn.active{background:var(--blue);border-color:var(--blue);color:white;}
+
+/* ── Game Rows (alternating layout) ── */
+.games-list{display:flex;flex-direction:column;gap:2px;}
+.game-row{background:var(--surface);position:relative;overflow:hidden;cursor:pointer;transition:filter .25s;}
+.game-row:hover{filter:brightness(1.06);}
+.game-row-body{display:flex;min-height:260px;}
+.game-row-image{
+  width:42%;flex-shrink:0;overflow:hidden;position:relative;
+  background:var(--surface2);
 }
-.game-card{
-  background:var(--surface);border:1px solid var(--border);
-  position:relative;overflow:hidden;cursor:pointer;
-  transition:transform .3s,border-color .3s;
-  display:flex;flex-direction:column;
-}
-.game-card:hover{border-color:rgba(0,229,255,.25);transform:translateY(-4px);z-index:2;}
-.game-card:hover .card-overlay{opacity:1;}
-.game-card:hover .card-img{transform:scale(1.05);}
-.game-card:hover .card-studio{color:var(--cyan);}
-.card-thumb{height:200px;overflow:hidden;background:var(--surface2);position:relative;flex-shrink:0;}
-.card-img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
-.card-thumb-placeholder{
+.game-row-img-inner{
   width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,var(--surface2) 0%,#1a2140 100%);
+  transition:transform .4s ease;
 }
-.thumb-icon{font-size:48px;opacity:.2;}
-.card-overlay{
-  position:absolute;inset:0;background:linear-gradient(to top,rgba(0,229,255,.2),transparent);
-  opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;justify-content:flex-end;padding:12px;
+.game-row:hover .game-row-img-inner{transform:scale(1.04);}
+.row-emoji{font-size:72px;opacity:.18;}
+.game-row-content{
+  flex:1;padding:32px 40px;
+  display:flex;flex-direction:column;justify-content:center;
 }
-.card-badge{font-family:var(--font-ui);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;background:var(--rose);color:white;padding:4px 8px;}
-.card-genre-tag{
-  position:absolute;top:12px;left:12px;
-  font-family:var(--font-ui);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  background:rgba(6,8,16,.75);color:var(--cyan);border:1px solid rgba(0,229,255,.3);
-  padding:3px 8px;backdrop-filter:blur(4px);
+.game-row-title{
+  font-family:var(--font-display);font-size:clamp(28px,2.8vw,44px);
+  letter-spacing:.04em;color:white;line-height:1;margin-bottom:6px;
 }
-.card-body{padding:20px;flex:1;display:flex;flex-direction:column;}
-.card-studio{font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;transition:color .2s;}
-.card-title{font-family:var(--font-ui);font-size:16px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:10px;}
-.card-desc{font-size:13px;font-weight:300;color:rgba(232,234,242,.5);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
-.card-platforms{display:flex;gap:6px;}
-.platform-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
-.card-link{font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);text-decoration:none;opacity:0;transition:opacity .2s;}
-.game-card:hover .card-link{opacity:1;}
+.game-row-studio{
+  font-family:var(--font-ui);font-size:11px;font-weight:400;font-style:italic;
+  letter-spacing:.08em;color:rgba(255,255,255,.45);
+  text-transform:uppercase;margin-bottom:14px;
+}
+.game-row-desc{
+  font-size:13px;font-weight:300;color:rgba(255,255,255,.55);
+  line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* Footer bar */
+.game-row-footer{
+  display:flex;align-items:stretch;height:56px;
+  background:var(--blue);
+}
+.game-row.row-reverse .game-row-body{flex-direction:row-reverse;}
+.game-row.row-reverse .game-row-footer{flex-direction:row-reverse;}
+
+/* Steam button */
+.steam-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:68px;flex-shrink:0;
+  background:rgba(0,0,0,.35);
+  border:none;cursor:pointer;text-decoration:none;color:white;
+  position:relative;transition:background .2s;
+}
+.steam-btn:hover{background:rgba(0,0,0,.5);}
+/* diagonal divider on steam btn */
+.steam-btn::after{
+  content:'';position:absolute;right:-14px;top:0;bottom:0;width:28px;
+  background:rgba(0,0,0,.35);
+  clip-path:polygon(0 0,50% 0,100% 100%,50% 100%);
+  pointer-events:none;
+}
+.game-row.row-reverse .steam-btn::after{
+  right:auto;left:-14px;
+  clip-path:polygon(50% 0,100% 0,50% 100%,0 100%);
+}
+
+/* Read more button */
+.read-more-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);font-size:11px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:white;
+  text-decoration:none;border:none;background:none;cursor:pointer;
+  transition:background .2s;
+}
+.read-more-btn:hover{background:rgba(255,255,255,.1);}
 
 /* ═══════════════════════════════════════════
    JOBS BANNER (on landing page)
@@ -501,28 +534,15 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
      NAV (shared)
 ═══════════════════════════════════════════ -->
 <nav id="mainNav">
-  <div class="nav-logo" onclick="navigate('home')">
-    <svg width="22" height="28" viewBox="0 0 40 48" fill="#00e5ff" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 2C20 2 24 8 24 14C24 17 22 19 20 20C18 19 16 17 16 14C16 8 20 2 20 2Z"/>
-      <path d="M8 10C8 10 6 17 10 22C12 24.5 15 24.5 17 23C16 21 14 19 14 16C14 13 16 11 18 10C15 8 11 8 8 10Z"/>
-      <path d="M32 10C32 10 34 17 30 22C28 24.5 25 24.5 23 23C24 21 26 19 26 16C26 13 24 11 22 10C25 8 29 8 32 10Z"/>
-      <rect x="17" y="24" width="6" height="20" rx="1"/>
-      <path d="M13 40H27L25 46H15L13 40Z"/>
-    </svg>
-    <span class="nav-logo-text">GAMES<span>·</span>QC</span>
-  </div>
   <ul class="nav-links">
     <li><a id="navGames" onclick="navigate('home')" class="active">Games</a></li>
-    <li><a id="navStudios" onclick="navigate('home')">Studios</a></li>
-    <li><a id="navIndustry" href="#">Industry</a></li>
-    <li><a id="navJobs" onclick="navigate('jobs')">Jobs</a></li>
+    <li><a id="navIndustry" href="#">The Industry</a></li>
   </ul>
   <div class="nav-right">
-    <button class="nav-jobs-btn" onclick="navigate('jobs')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-      View Jobs
+    <button class="nav-search" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     </button>
-    <span class="nav-lang">FR</span>
+    <button class="nav-lang">Français</button>
   </div>
 </nav>
 
@@ -531,35 +551,18 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 ═══════════════════════════════════════════ -->
 <div id="page-home" class="page active">
 
-  <!-- HERO -->
+  <!-- HERO BANNER -->
   <section class="hero">
     <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
-    <div class="hero-featured">
-      <div class="hero-game-tile" style="background:linear-gradient(135deg,#1a0a24,#0d1a30)"><div class="tile-label">DEAD BY DAYLIGHT</div></div>
-      <div class="hero-game-tile" style="background:linear-gradient(135deg,#0a1a20,#0d2010)"><div class="tile-label">SEA OF STARS</div></div>
-      <div class="hero-game-tile" style="background:linear-gradient(135deg,#201010,#1a150a)"><div class="tile-label">SPIRITFARER</div></div>
-      <div class="hero-game-tile" style="background:linear-gradient(135deg,#0a1520,#10081a)"><div class="tile-label">THE MESSENGER</div></div>
-    </div>
-    <p class="hero-eyebrow">La Guilde du jeu vidéo du Québec</p>
-    <h1 class="hero-headline">MADE<br>IN <span class="hl-cyan">QUÉ</span><span class="hl-rose">BEC</span></h1>
-    <p class="hero-desc">A showcase of world-class video games born in Québec — from indie studios in Montréal to legendary developers reshaping the industry.</p>
-    <div class="hero-stats">
-      <div><div class="stat-num">15<span class="accent">K</span><span style="font-size:28px;color:var(--rose)">+</span></div><div class="stat-label">Industry Professionals</div></div>
-      <div><div class="stat-num">300<span style="font-size:28px;color:var(--rose)">+</span></div><div class="stat-label">Active Studios</div></div>
-      <div><div class="stat-num">100<span style="font-size:28px;color:var(--rose)">+</span></div><div class="stat-label">Listed Games</div></div>
-    </div>
-    <div class="hero-cta">
-      <button class="btn-primary" onclick="document.getElementById('games-anchor').scrollIntoView({behavior:'smooth'})">
-        Explore Games
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-      <button class="btn-ghost" onclick="navigate('jobs')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-        Browse Jobs
-      </button>
+    <div class="hero-brand">
+      <div class="hero-brand-top">VIDEO GAMES</div>
+      <div class="hero-brand-from">FROM</div>
+      <div class="hero-brand-main">QUÉBEC</div>
     </div>
   </section>
+
+  <!-- SUBTITLE BAR -->
+  <div class="hero-subtitle">DISCOVER QUÉBEC IMAGINATION &amp; CREATIVITY THROUGH VIDEO GAMES</div>
 
   <!-- MARQUEE -->
   <div class="marquee-strip" aria-hidden="true"><div class="marquee-inner" id="marqueeInner"></div></div>
@@ -613,7 +616,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
         <button class="filter-btn" data-filter="Co-op">Co-op</button>
       </div>
     </div>
-    <div class="games-grid" id="gamesGrid"></div>
+    <div class="games-list" id="gamesList"></div>
     <div class="load-more-wrap"><button class="btn-load" id="loadMoreBtn">Load More Games</button></div>
   </section>
 
@@ -802,9 +805,8 @@ function navigate(page) {
 
   // Update nav active state
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  if (page === 'home') document.getElementById('navGames').classList.add('active');
+  if (page === 'home') { const el = document.getElementById('navGames'); if(el) el.classList.add('active'); }
   if (page === 'jobs') {
-    document.getElementById('navJobs').classList.add('active');
     if (!jobsInitialized) { jobsInitialized = true; runSearch(); }
   }
 }
@@ -843,34 +845,34 @@ mi.innerHTML = marqItems.map(g=>`<span class="marquee-item">${g}</span>`).join('
 let visibleCount = 9;
 let currentFilter = 'all';
 
+/* Steam icon SVG */
+const steamSVG = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.236 2.636 7.855 6.356 9.312L10.3 17.4a3.001 3.001 0 1 1 3.666-3.582l4.266-1.738C17.794 9.088 15.116 6 12 6a6 6 0 0 0-6 6c0 .682.114 1.337.322 1.947l-2.196-.893A9.953 9.953 0 0 1 4 12C4 7.582 7.582 4 12 4s8 3.582 8 8-3.582 8-8 8a7.972 7.972 0 0 1-4.019-1.079l1.53-3.725A3 3 0 1 1 12 11a2.999 2.999 0 0 1-1.337.315l-.946 2.303A9.964 9.964 0 0 0 12 14c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>`;
+
 function renderGames() {
-  const grid = document.getElementById('gamesGrid');
+  const list = document.getElementById('gamesList');
   const filtered = currentFilter === 'all' ? games : games.filter(g => g.genre === currentFilter);
   const toShow = filtered.slice(0, visibleCount);
   document.getElementById('gameCount').textContent = `Showing ${toShow.length} of ${filtered.length} games`;
-  grid.innerHTML = toShow.map((g, i) => `
-    <div class="game-card reveal" style="transition-delay:${(i%3)*.07}s">
-      <div class="card-thumb">
-        <div class="card-thumb-placeholder" style="background:linear-gradient(135deg,${g.color[0]},${g.color[1]})">
-          <div class="thumb-icon">${g.emoji}</div>
+  list.innerHTML = toShow.map((g, i) => {
+    const rev = i % 2 !== 0 ? 'row-reverse' : '';
+    return `
+    <div class="game-row ${rev} reveal" style="transition-delay:${i*.04}s">
+      <div class="game-row-body">
+        <div class="game-row-image" style="background:linear-gradient(135deg,${g.color[0]},${g.color[1]})">
+          <div class="game-row-img-inner"><span class="row-emoji">${g.emoji}</span></div>
         </div>
-        <div class="card-genre-tag">${g.genre}</div>
-        <div class="card-overlay"><span class="card-badge">Québec</span></div>
-      </div>
-      <div class="card-body">
-        <div class="card-studio">${g.studio}</div>
-        <div class="card-title">${g.title}</div>
-        <div class="card-desc">${g.desc}</div>
-        <div class="card-footer">
-          <div class="card-platforms">
-            <div class="platform-dot" style="background:var(--cyan)"></div>
-            <div class="platform-dot"></div>
-            <div class="platform-dot"></div>
-          </div>
-          <a class="card-link" href="#">View Game →</a>
+        <div class="game-row-content">
+          <div class="game-row-title">${g.title}</div>
+          <div class="game-row-studio">${g.studio}</div>
+          <div class="game-row-desc">${g.desc}</div>
         </div>
       </div>
-    </div>`).join('');
+      <div class="game-row-footer">
+        <a class="steam-btn" href="#" title="View on Steam">${steamSVG}</a>
+        <a class="read-more-btn" href="#">READ MORE</a>
+      </div>
+    </div>`;
+  }).join('');
   document.getElementById('loadMoreBtn').style.display = filtered.length <= visibleCount ? 'none' : 'block';
   observeReveal();
 }
