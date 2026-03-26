@@ -94,12 +94,13 @@ function getFilteredJobs() {
 // GOOGLE JOBS FETCH (SerpApi)
 // ===============================
 
-async function fetchGoogleJobs(query, location) {
+async function fetchJobsPage(query, location, start) {
   const params = new URLSearchParams({
     engine: 'google_jobs',
     q: query,
     location: location || 'Quebec, Canada',
     hl: 'en',
+    start: start,
     api_key: SERPAPI_KEY
   });
 
@@ -125,6 +126,15 @@ async function fetchGoogleJobs(query, location) {
     jobType: item.detected_extensions?.schedule_type || '',
     salary: item.detected_extensions?.salary || ''
   }));
+}
+
+async function fetchGoogleJobs(query, location) {
+  const pages = await Promise.all([
+    fetchJobsPage(query, location, 0),
+    fetchJobsPage(query, location, 10),
+    fetchJobsPage(query, location, 20)
+  ]);
+  return pages.flat();
 }
 
 // ===============================
