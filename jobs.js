@@ -91,7 +91,8 @@ function getFilteredJobs() {
 }
 
 // ===============================
-// INDEED CANADA RSS FETCH (free, no API key)
+// REMOTIVE API (free, no key, CORS-native — no proxy needed)
+// https://remotive.com/api/remote-jobs
 // ===============================
 
 function formatAge(date) {
@@ -102,64 +103,43 @@ function formatAge(date) {
   return date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
 }
 
-// Try each proxy in order, return raw text from the first that responds
-const CORS_PROXIES = [
-  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-];
-
-async function fetchWithProxy(targetUrl) {
-  let lastErr;
-  for (const proxy of CORS_PROXIES) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000);
-    try {
-      const res = await fetch(proxy(targetUrl), { signal: controller.signal });
-      clearTimeout(timer);
-      if (res.ok) return await res.text();
-    } catch (e) {
-      clearTimeout(timer);
-      lastErr = e;
-    }
-  }
-  throw new Error('Could not reach job listings — all proxies unavailable. Please try again later.');
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent || '').replace(/\s+/g, ' ').trim();
 }
 
-async function fetchIndeedJobs(query, location) {
-  const q = encodeURIComponent(query || 'game developer');
-  const l = encodeURIComponent(location || 'Quebec');
-  const indeedUrl = `https://ca.indeed.com/rss?q=${q}&l=${l}&radius=100&limit=50&sort=date`;
+async function fetchRemotiveJobs(query) {
+  const search = encodeURIComponent(query || 'game developer');
 
-  const text = await fetchWithProxy(indeedUrl);
+  // Fetch from two categories in parallel
+  const [devRes, artRes] = await Promise.allSettled([
+    fetch(`https://remotive.com/api/remote-jobs?category=software-dev&search=${search}&limit=30`),
+    fetch(`https://remotive.com/api/remote-jobs?category=design&search=${search}&limit=20`),
+  ]);
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(text, 'text/xml');
-  const items = [...doc.querySelectorAll('item')];
+  const jobs = [];
+  for (const result of [devRes, artRes]) {
+    if (result.status === 'fulfilled' && result.value.ok) {
+      const data = await result.value.json();
+      jobs.push(...(data.jobs || []));
+    }
+  }
 
-  if (!items.length) throw new Error('No jobs found for this search. Try different keywords.');
+  if (!jobs.length) throw new Error('No jobs found. Try different keywords like "unity", "artist", or "designer".');
 
-  return items.map(item => {
-    // Indeed title format: "Job Title - Company - City, Province"
-    const rawTitle = item.querySelector('title')?.textContent || '';
-    const parts = rawTitle.split(' - ');
-    const title    = parts[0]?.trim() || rawTitle;
-    const company  = parts[1]?.trim() || '';
-    const jobLoc   = parts.slice(2).join(' – ').trim() || location || 'Quebec';
-
-    const link    = item.querySelector('link')?.textContent?.trim() || '#';
-    const pubDate = item.querySelector('pubDate')?.textContent || '';
-    const descRaw = item.querySelector('description')?.textContent || '';
-
-    // Strip HTML tags for snippet
-    const div = document.createElement('div');
-    div.innerHTML = descRaw;
-    const snippet = (div.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 200);
-
-    const posted = pubDate ? formatAge(new Date(pubDate)) : '';
-
-    return { title, company, location: jobLoc, snippet, url: link, posted, jobType: '', salary: '' };
-  });
+  // Deduplicate by id
+  const seen = new Set();
+  return jobs.filter(j => seen.has(j.id) ? false : seen.add(j.id)).map(j => ({
+    title:    j.title,
+    company:  j.company_name,
+    location: j.candidate_required_location || 'Remote',
+    snippet:  stripHtml(j.description).slice(0, 200),
+    url:      j.url,
+    posted:   j.publication_date ? formatAge(new Date(j.publication_date)) : '',
+    jobType:  (j.job_type || '').replace(/_/g, '-'),
+    salary:   j.salary || '',
+  }));
 }
 
 // ===============================
@@ -190,7 +170,7 @@ async function runSearch() {
   `;
 
   try {
-    jobsData = await fetchIndeedJobs(query, location);
+    jobsData = await fetchRemotiveJobs(query);
     visibleJobs = 12;
     renderJobs();
   } catch (err) {
