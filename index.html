@@ -397,19 +397,21 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 .indeed-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);}
 .studio-careers-bar{display:flex;flex-direction:column;align-items:center;padding:48px 60px 40px;gap:20px;}
 .studio-careers-label{font-family:var(--font-ui);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--rose);margin-bottom:4px;}
-.studio-careers-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:900px;}
+.studio-careers-grid{display:flex;flex-wrap:nowrap;justify-content:center;gap:12px;width:100%;overflow-x:auto;padding-bottom:4px;}
+.studio-careers-grid::-webkit-scrollbar{height:3px;}
+.studio-careers-grid::-webkit-scrollbar-thumb{background:var(--border);}
 .studio-careers-link{
-  font-family:var(--font-display);font-size:22px;letter-spacing:.06em;
+  font-family:var(--font-display);font-size:18px;letter-spacing:.06em;
   color:var(--text);text-decoration:none;
-  padding:18px 32px;min-width:160px;text-align:center;
+  padding:14px 20px;min-width:120px;text-align:center;flex-shrink:0;
   background:var(--surface);border:1px solid var(--border);
   transition:border-color .2s,color .2s,background .2s,transform .2s;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
 }
 .studio-careers-link:hover{border-color:var(--blue);color:white;background:rgba(26,71,255,.08);transform:translateY(-3px);}
-.studio-logo{width:40px;height:40px;object-fit:contain;filter:brightness(0) invert(1);opacity:.7;transition:opacity .2s;}
+.studio-logo{width:32px;height:32px;object-fit:contain;filter:brightness(0) invert(1);opacity:.7;transition:opacity .2s;}
 .studio-careers-link:hover .studio-logo{opacity:1;}
-.studio-name{font-size:18px;}
+.studio-name{font-size:15px;}
 .jobs-layout{display:grid;grid-template-columns:268px 1fr;}
 .jobs-sidebar{
   border-right:1px solid var(--border);padding:28px 24px;
@@ -755,9 +757,14 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
       </a>
 
       <a class="studio-careers-link" href="https://jobs.ea.com/en_US/careers/Home/?8171=%5B10577%5D&8171_format=5683&listFilterMode=1&jobRecordsPerPage=20&" target="_blank" rel="noopener">
-        <!-- EA logo -->
         <svg class="studio-logo" viewBox="0 0 40 40" fill="white"><text x="3" y="29" font-size="26" font-weight="900" font-family="Arial,sans-serif" fill="white">EA</text></svg>
         <span class="studio-name">EA</span>
+      </a>
+
+      <a class="studio-careers-link" href="https://redbarrelsgames.com/careers/job-listing/" target="_blank" rel="noopener">
+        <!-- Red Barrels barrel mark -->
+        <svg class="studio-logo" viewBox="0 0 40 40" fill="white"><rect x="10" y="6" width="20" height="28" rx="4" fill="none" stroke="white" stroke-width="2.5"/><line x1="10" y1="14" x2="30" y2="14" stroke="white" stroke-width="2"/><line x1="10" y1="26" x2="30" y2="26" stroke="white" stroke-width="2"/><line x1="20" y1="6" x2="20" y2="34" stroke="white" stroke-width="1.5"/></svg>
+        <span class="studio-name">Red Barrels</span>
       </a>
 
     </div>
