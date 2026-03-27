@@ -697,11 +697,11 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
       <span class="current">Jobs</span>
     </div>
     <h1 class="page-title">WORK IN<br><span class="hl">GAME DEV</span></h1>
-    <p class="page-subtitle">Live job listings from Québec's video game industry — from indie studios to AAA powerhouses. Powered by Google Jobs.</p>
+    <p class="page-subtitle">Remote game industry job listings from studios worldwide — from indie to AAA. Powered by Remotive.</p>
     <div class="page-header-meta">
       <div class="meta-pill"><div class="meta-dot"></div> Live Listings</div>
       <div class="meta-pill rose">Québec Only</div>
-      <div class="indeed-badge"><div class="indeed-dot"></div>Via Google Jobs</div>
+      <div class="indeed-badge"><div class="indeed-dot"></div>Via Remotive</div>
     </div>
   </div>
 
@@ -772,9 +772,8 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
           <input class="search-input" type="text" id="keywordsInput" placeholder="e.g. Game Designer, Unity…" value="game developer">
           <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </div>
-        <div class="search-input-wrap">
-          <input class="search-input" type="text" id="locationInput" placeholder="Location…" value="Quebec">
-          <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div class="search-input-wrap" style="display:none">
+          <input class="search-input" type="text" id="locationInput" value="Quebec">
         </div>
         <button class="search-btn" id="searchBtn" onclick="runSearch()">Search Jobs</button>
       </div>
