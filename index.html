@@ -82,7 +82,7 @@ nav {
 }
 .hero-bg{
   position:absolute;inset:0;
-  background-image:url('image (1).png');
+  background-image:url('banniere gamesqc.png');
   background-size:cover;
   background-position:center center;
   background-repeat:no-repeat;
@@ -91,24 +91,10 @@ nav {
   content:'';position:absolute;inset:0;
   background:linear-gradient(to bottom, rgba(6,8,16,.2) 0%, rgba(6,8,16,.4) 100%);
 }
-.hero-brand{
+.hero-logo{
   position:relative;z-index:2;
-  display:flex;flex-direction:column;align-items:center;
-  text-align:center;
-  text-shadow: 0 2px 20px rgba(0,0,0,.8), 0 0 60px rgba(0,0,0,.5);
-}
-.hero-brand-top{
-  font-family:var(--font-display);font-size:clamp(28px,4vw,48px);
-  letter-spacing:.22em;color:white;line-height:1;
-}
-.hero-brand-from{
-  font-family:var(--font-display);font-size:clamp(14px,2vw,22px);
-  letter-spacing:.35em;color:rgba(255,255,255,.85);line-height:1.2;
-  margin:2px 0;
-}
-.hero-brand-main{
-  font-family:var(--font-display);font-size:clamp(72px,10vw,148px);
-  letter-spacing:.04em;color:white;line-height:.88;
+  max-height:220px;width:auto;
+  display:block;
 }
 .hero-subtitle{
   background:var(--black);
@@ -549,11 +535,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
   <!-- HERO BANNER -->
   <section class="hero">
     <div class="hero-bg"></div>
-    <div class="hero-brand">
-      <div class="hero-brand-top">VIDEO GAMES</div>
-      <div class="hero-brand-from">FROM</div>
-      <div class="hero-brand-main">QUÉBEC</div>
-    </div>
+    <img src="logo gamesqc.png" alt="Games from Québec" class="hero-logo">
   </section>
 
   <!-- SUBTITLE BAR -->
