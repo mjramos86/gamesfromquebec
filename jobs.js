@@ -91,51 +91,56 @@ function getFilteredJobs() {
 }
 
 // ===============================
-// GOOGLE JOBS FETCH (SerpApi)
+// INDEED CANADA RSS FETCH (free, no API key)
 // ===============================
 
-async function fetchGoogleJobs(query, location) {
-  const results = [];
-  let nextPageToken = null;
+function formatAge(date) {
+  const days = Math.floor((Date.now() - date) / 86400000);
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 30) return `${days} days ago`;
+  return date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+}
 
-  for (let page = 0; page < 3; page++) {
-    const paramObj = {
-      engine: 'google_jobs',
-      q: query,
-      location: location || 'Quebec, Canada',
-      hl: 'en',
-      api_key: SERPAPI_KEY
-    };
-    if (nextPageToken) paramObj.next_page_token = nextPageToken;
+async function fetchIndeedJobs(query, location) {
+  const q = encodeURIComponent(query || 'game developer');
+  const l = encodeURIComponent(location || 'Quebec');
+  const indeedUrl = `https://ca.indeed.com/rss?q=${q}&l=${l}&radius=100&limit=50&sort=date`;
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(indeedUrl)}`;
 
-    const params = new URLSearchParams(paramObj);
-    const serpUrl = `https://serpapi.com/search.json?${params}`;
-    const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(serpUrl)}`);
+  const res = await fetch(proxyUrl);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || `HTTP ${res.status}`);
-    }
+  const wrapper = await res.json();
+  if (!wrapper.contents) throw new Error('No response from job board');
 
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(wrapper.contents, 'text/xml');
+  const items = [...doc.querySelectorAll('item')];
 
-    results.push(...(data.jobs_results || []).map(item => ({
-      title: item.title,
-      company: item.company_name,
-      location: item.location,
-      snippet: (item.description || '').slice(0, 160),
-      url: item.apply_options?.[0]?.link || item.related_links?.[0]?.link || '#',
-      posted: item.detected_extensions?.posted_at || '',
-      jobType: item.detected_extensions?.schedule_type || '',
-      salary: item.detected_extensions?.salary || ''
-    })));
+  if (!items.length) throw new Error('No jobs found for this search. Try different keywords.');
 
-    nextPageToken = data.serpapi_pagination?.next_page_token;
-    if (!nextPageToken) break;
-  }
+  return items.map(item => {
+    // Indeed title format: "Job Title - Company - City, Province"
+    const rawTitle = item.querySelector('title')?.textContent || '';
+    const parts = rawTitle.split(' - ');
+    const title    = parts[0]?.trim() || rawTitle;
+    const company  = parts[1]?.trim() || '';
+    const jobLoc   = parts.slice(2).join(' – ').trim() || location || 'Quebec';
 
-  return results;
+    const link    = item.querySelector('link')?.textContent?.trim() || '#';
+    const pubDate = item.querySelector('pubDate')?.textContent || '';
+    const descRaw = item.querySelector('description')?.textContent || '';
+
+    // Strip HTML tags for snippet
+    const div = document.createElement('div');
+    div.innerHTML = descRaw;
+    const snippet = (div.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+
+    const posted = pubDate ? formatAge(new Date(pubDate)) : '';
+
+    return { title, company, location: jobLoc, snippet, url: link, posted, jobType: '', salary: '' };
+  });
 }
 
 // ===============================
@@ -166,7 +171,7 @@ async function runSearch() {
   `;
 
   try {
-    jobsData = await fetchGoogleJobs(query, location);
+    jobsData = await fetchIndeedJobs(query, location);
     visibleJobs = 12;
     renderJobs();
   } catch (err) {
