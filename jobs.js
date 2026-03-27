@@ -102,20 +102,39 @@ function formatAge(date) {
   return date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
 }
 
+// Try each proxy in order, return raw text from the first that responds
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+];
+
+async function fetchWithProxy(targetUrl) {
+  let lastErr;
+  for (const proxy of CORS_PROXIES) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    try {
+      const res = await fetch(proxy(targetUrl), { signal: controller.signal });
+      clearTimeout(timer);
+      if (res.ok) return await res.text();
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e;
+    }
+  }
+  throw new Error('Could not reach job listings — all proxies unavailable. Please try again later.');
+}
+
 async function fetchIndeedJobs(query, location) {
   const q = encodeURIComponent(query || 'game developer');
   const l = encodeURIComponent(location || 'Quebec');
   const indeedUrl = `https://ca.indeed.com/rss?q=${q}&l=${l}&radius=100&limit=50&sort=date`;
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(indeedUrl)}`;
 
-  const res = await fetch(proxyUrl);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-  const wrapper = await res.json();
-  if (!wrapper.contents) throw new Error('No response from job board');
+  const text = await fetchWithProxy(indeedUrl);
 
   const parser = new DOMParser();
-  const doc = parser.parseFromString(wrapper.contents, 'text/xml');
+  const doc = parser.parseFromString(text, 'text/xml');
   const items = [...doc.querySelectorAll('item')];
 
   if (!items.length) throw new Error('No jobs found for this search. Try different keywords.');
