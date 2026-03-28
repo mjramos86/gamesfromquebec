@@ -551,6 +551,95 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
   clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
 }
 .load-more-jobs-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+.nav-burger{
+  display:none;background:none;border:none;cursor:pointer;
+  color:var(--text);padding:8px;flex-direction:column;justify-content:center;gap:5px;
+}
+.nav-burger span{display:block;width:22px;height:2px;background:currentColor;transition:all .25s;}
+nav.nav-open .nav-burger span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+nav.nav-open .nav-burger span:nth-child(2){opacity:0;}
+nav.nav-open .nav-burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+@media(max-width:768px){
+  /* NAV */
+  nav{padding:0 20px;}
+  .nav-burger{display:flex;}
+  .nav-links{
+    display:none;position:absolute;top:64px;left:0;right:0;z-index:199;
+    flex-direction:column;gap:0;align-items:stretch;
+    background:rgba(6,8,16,.97);backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);padding:8px 0;
+  }
+  nav.nav-open .nav-links{display:flex;}
+  .nav-links li{width:100%;}
+  .nav-links a{display:block;padding:14px 24px;font-size:13px;}
+  .nav-right{gap:12px;}
+
+  /* HERO */
+  .hero{height:240px;}
+  .hero-logo{max-height:200px;}
+  .hero-subtitle{padding:16px 20px;font-size:10px;letter-spacing:.12em;}
+  #page-title-bar{padding:20px 24px 14px;}
+
+  /* STATS */
+  .stats-band{grid-template-columns:repeat(2,1fr);}
+  .stats-band-item{padding:28px 24px;}
+  .band-num{font-size:40px;}
+
+  /* GAMES SECTION */
+  .games-section{padding:32px 0;}
+  .filters-wrap{padding:24px 20px 0;}
+  .section-title{font-size:38px;}
+  .game-row-body{flex-direction:column!important;min-height:unset;}
+  .game-row.row-reverse .game-row-body{flex-direction:column!important;}
+  .game-row-image{width:100%;height:180px;}
+  .game-row-content{padding:20px 20px 16px;}
+  .game-row-title{font-size:clamp(22px,6vw,32px);}
+  .game-row.row-reverse .game-row-footer{flex-direction:row;}
+  .steam-btn::after,.game-row.row-reverse .steam-btn::after{display:none;}
+  .load-more-wrap{padding:32px 20px;}
+
+  /* JOBS BANNER */
+  .jobs-banner{margin:0 20px 2px;padding:28px 24px;flex-direction:column;align-items:flex-start;gap:20px;}
+  .jobs-banner-right{flex-direction:row;align-items:center;gap:24px;}
+
+  /* FEATURED / STUDIOS */
+  .featured-section{padding:48px 20px;}
+  .featured-grid{grid-template-columns:1fr;}
+  .featured-card{padding:32px 24px;}
+
+  /* FOOTER */
+  footer{padding:40px 20px;}
+  .footer-inner{grid-template-columns:1fr;gap:36px;margin-bottom:36px;}
+  .footer-bottom{flex-direction:column;gap:10px;text-align:center;}
+
+  /* BLOG */
+  .blog-wrap{padding:48px 20px;}
+  .blog-post{padding-bottom:52px;margin-bottom:52px;}
+  .blog-post-meta{flex-wrap:wrap;gap:10px;}
+
+  /* JOBS PAGE */
+  .studio-careers-bar{padding:32px 20px 24px;}
+  .studio-careers-grid{justify-content:flex-start;}
+  .jobs-layout{grid-template-columns:1fr;}
+  .jobs-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:20px;}
+  .jobs-main{padding:20px 16px;}
+  .job-card{grid-template-columns:1fr;}
+  .job-right{flex-direction:row;align-items:center;justify-content:space-between;min-width:unset;margin-top:12px;}
+}
+
+@media(max-width:480px){
+  .stats-band{grid-template-columns:1fr;}
+  .stats-band-item{border-right:none;border-bottom:1px solid var(--border);}
+  .stats-band-item:last-child{border-bottom:none;}
+  .hero{height:200px;}
+  .hero-logo{max-height:170px;}
+  .section-header{flex-direction:column;align-items:flex-start;gap:12px;}
+}
+
 </style>
 </head>
 <body>
@@ -568,6 +657,9 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
   </ul>
   <div class="nav-right">
     <button class="nav-lang">Français</button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
@@ -921,6 +1013,7 @@ let jobsInitialized = false;
 const pageTitles = { games: 'THE GAMES', studios: 'THE STUDIOS', jobs: 'THE JOBS', blog: 'THE BLOG' };
 
 function navigate(page) {
+  document.getElementById('mainNav').classList.remove('nav-open');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1125,6 +1218,13 @@ function observeReveal() {
   }, { threshold: 0.07 });
   els.forEach(el => io.observe(el));
 }
+
+/* ═══════════════════════════════════════
+   BURGER MENU
+═══════════════════════════════════════ */
+document.getElementById('navBurger').addEventListener('click', () => {
+  document.getElementById('mainNav').classList.toggle('nav-open');
+});
 
 renderHomeGames();
 renderHomeStudios();
