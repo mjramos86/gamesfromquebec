@@ -354,6 +354,23 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 .reveal.visible{opacity:1;transform:none;}
 
 /* ═══════════════════════════════════════════
+   BLOG PAGE
+═══════════════════════════════════════════ */
+.blog-wrap{max-width:860px;margin:0 auto;padding:80px 60px;}
+.blog-post{padding-bottom:80px;margin-bottom:80px;border-bottom:1px solid var(--border);}
+.blog-post:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.blog-post-eyebrow{font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:16px;}
+.blog-post-title{font-family:var(--font-display);font-size:clamp(36px,4.5vw,64px);letter-spacing:.03em;line-height:1.05;color:var(--text);margin-bottom:24px;}
+.blog-post-meta{display:flex;align-items:center;gap:16px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:40px;padding-bottom:40px;border-bottom:1px solid var(--border);}
+.blog-post-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.blog-post-body{font-size:15px;font-weight:300;line-height:1.85;color:rgba(232,234,242,.75);}
+.blog-post-body p+p{margin-top:20px;}
+.blog-read-more{display:inline-flex;align-items:center;gap:8px;margin-top:36px;font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);border:none;background:none;cursor:pointer;text-decoration:none;transition:opacity .2s;}
+.blog-read-more:hover{opacity:.65;}
+.blog-read-more svg{transition:transform .2s;}
+.blog-read-more:hover svg{transform:translateX(4px);}
+
+/* ═══════════════════════════════════════════
    JOBS PAGE
 ═══════════════════════════════════════════ */
 #page-jobs{ padding-top:0; }
@@ -539,6 +556,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
     <li><a id="navGames" onclick="navigate('games')">The Games</a></li>
     <li><a id="navStudios" onclick="navigate('studios')">The Studios</a></li>
     <li><a id="navJobs" onclick="navigate('jobs')">The Jobs</a></li>
+    <li><a id="navBlog" onclick="navigate('blog')">The Blog</a></li>
   </ul>
   <div class="nav-right">
     <button class="nav-lang">Français</button>
@@ -647,6 +665,49 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
     </div>
   </footer>
 </div><!-- end page-home -->
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE: BLOG
+═══════════════════════════════════════════ -->
+<div id="page-blog" class="page">
+  <div class="blog-wrap">
+
+    <article class="blog-post reveal">
+      <div class="blog-post-eyebrow">Announcement</div>
+      <h2 class="blog-post-title">Welcome to the new Games from Québec website!</h2>
+      <div class="blog-post-meta">
+        <span>March 28, 2026</span>
+        <div class="blog-post-meta-dot"></div>
+        <span>La Guilde du jeu vidéo du Québec</span>
+      </div>
+      <div class="blog-post-body">
+        <p>We are thrilled to launch the brand-new Games from Québec — a revamped hub dedicated to showcasing the incredible depth, diversity, and talent of Québec's video game industry.</p>
+        <p>From indie darlings to globally celebrated AAA titles, this platform is your window into one of the world's most vibrant game development ecosystems. Explore our catalogue of games, discover the studios behind them, and find your next career opportunity in the industry.</p>
+        <p>This is only the beginning. In the months ahead, we'll be adding more games, more studios, developer interviews, and in-depth features on the people shaping Québec's gaming landscape. Stay tuned.</p>
+      </div>
+      <a class="blog-read-more" href="#">Read Full Post <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </article>
+
+    <article class="blog-post reveal" style="transition-delay:.1s">
+      <div class="blog-post-eyebrow">Industry</div>
+      <h2 class="blog-post-title">A Brief History of Our Industry</h2>
+      <div class="blog-post-meta">
+        <span>February 14, 2026</span>
+        <div class="blog-post-meta-dot"></div>
+        <span>La Guilde du jeu vidéo du Québec</span>
+      </div>
+      <div class="blog-post-body">
+        <p>Québec's video game industry didn't happen by accident. It was built over four decades by thousands of developers, artists, designers, and entrepreneurs who chose to bet on games as a legitimate cultural and economic force.</p>
+        <p>The story often begins in 1997, when Ubisoft opened its Montréal studio — a landmark moment that proved Québec could compete at the highest level of global game development. That bet paid off spectacularly: Ubisoft Montréal became one of the largest game studios in the world, home to some of the industry's most iconic franchises.</p>
+        <p>But the real story is broader. In 2003, La Guilde du jeu vidéo du Québec was founded to support and unite the growing ecosystem — from giants like Eidos-Montréal and WB Games Montréal to indie powerhouses like Sabotage Studio, Thunder Lotus, and Red Barrels. Today, the province is home to over 200 studios, generating more than 1.4 billion dollars in annual revenue and employing over 14,000 people.</p>
+        <p>Games from Québec is a testament to that story — and a commitment to keeping it growing.</p>
+      </div>
+      <a class="blog-read-more" href="#">Read Full Post <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </article>
+
+  </div>
+</div>
 
 
 <!-- ═══════════════════════════════════════════
@@ -856,7 +917,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
    NAVIGATION
 ═══════════════════════════════════════ */
 let jobsInitialized = false;
-const pageTitles = { games: 'THE GAMES', studios: 'THE STUDIOS', jobs: 'THE JOBS' };
+const pageTitles = { games: 'THE GAMES', studios: 'THE STUDIOS', jobs: 'THE JOBS', blog: 'THE BLOG' };
 
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
