@@ -1,0 +1,7 @@
+name: "WB Games Montréal"
+city: "Montréal"
+desc: "Creator of Batman: Arkham Origins and Gotham Knights — a studio with deep expertise in building open-world action games set in beloved DC universes."
+website: https://wbgamesmontreal.com
+games:
+  - "Batman: Arkham Origins"
+  - Gotham Knights

@@ -1,0 +1,115 @@
+media:
+  input: images
+  output: /images
+
+content:
+  - name: blog
+    label: Blog Posts
+    path: _posts/{year}-{month}-{day}-{slug}
+    type: collection
+    view:
+      fields: [title, date, author, category, draft]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: date
+        label: Date
+        type: date
+        required: true
+      - name: author
+        label: Author
+        type: string
+        default: "La Guilde du jeu vidéo du Québec"
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values:
+            - Announcement
+            - Industry
+            - Developer Spotlight
+            - Events
+            - News
+      - name: draft
+        label: Draft
+        type: boolean
+        default: true
+      - name: body
+        label: Content
+        type: rich-text
+
+  - name: games
+    label: Games
+    path: _data/games/{slug}
+    type: collection
+    view:
+      fields: [title, studio, genre]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: studio
+        label: Studio
+        type: string
+        required: true
+      - name: genre
+        label: Genre
+        type: select
+        required: true
+        options:
+          values:
+            - Action
+            - Adventure
+            - Co-op
+            - Horror
+            - Puzzle
+            - Roguelike
+            - RPG
+            - Strategy
+      - name: desc
+        label: Description
+        type: text
+        required: true
+      - name: emoji
+        label: Emoji
+        type: string
+      - name: color_from
+        label: "Gradient Color (from)"
+        type: string
+        default: "#0a0a0a"
+      - name: color_to
+        label: "Gradient Color (to)"
+        type: string
+        default: "#1a1a1a"
+
+  - name: studios
+    label: Studios
+    path: _data/studios/{slug}
+    type: collection
+    view:
+      fields: [name, city]
+    fields:
+      - name: name
+        label: Studio Name
+        type: string
+        required: true
+      - name: city
+        label: City
+        type: string
+        required: true
+      - name: desc
+        label: Description
+        type: text
+        required: true
+      - name: website
+        label: Website URL
+        type: string
+      - name: games
+        label: Notable Games
+        type: array
+        items:
+          type: string
