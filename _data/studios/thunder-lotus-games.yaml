@@ -1,0 +1,8 @@
+name: Thunder Lotus Games
+city: "Montréal"
+desc: "Hand-crafted games with deeply emotional narratives. Spiritfarer reframed how games can handle grief, reaching millions with its heartfelt management mechanics."
+website: https://thunderlotusgames.com
+games:
+  - Spiritfarer
+  - Jotun
+  - Sundered

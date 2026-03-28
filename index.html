@@ -771,41 +771,8 @@ nav.nav-open .nav-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
      PAGE: BLOG
 ═══════════════════════════════════════════ -->
 <div id="page-blog" class="page">
-  <div class="blog-wrap">
-
-    <article class="blog-post reveal">
-      <div class="blog-post-eyebrow">Announcement</div>
-      <h2 class="blog-post-title">Welcome to the new Games from Québec website!</h2>
-      <div class="blog-post-meta">
-        <span>March 28, 2026</span>
-        <div class="blog-post-meta-dot"></div>
-        <span>La Guilde du jeu vidéo du Québec</span>
-      </div>
-      <div class="blog-post-body">
-        <p>We are thrilled to launch the brand-new Games from Québec — a revamped hub dedicated to showcasing the incredible depth, diversity, and talent of Québec's video game industry.</p>
-        <p>From indie darlings to globally celebrated AAA titles, this platform is your window into one of the world's most vibrant game development ecosystems. Explore our catalogue of games, discover the studios behind them, and find your next career opportunity in the industry.</p>
-        <p>This is only the beginning. In the months ahead, we'll be adding more games, more studios, developer interviews, and in-depth features on the people shaping Québec's gaming landscape. Stay tuned.</p>
-      </div>
-      <a class="blog-read-more" href="#">Read Full Post <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-    </article>
-
-    <article class="blog-post reveal" style="transition-delay:.1s">
-      <div class="blog-post-eyebrow">Industry</div>
-      <h2 class="blog-post-title">A Brief History of Our Industry</h2>
-      <div class="blog-post-meta">
-        <span>February 14, 2026</span>
-        <div class="blog-post-meta-dot"></div>
-        <span>La Guilde du jeu vidéo du Québec</span>
-      </div>
-      <div class="blog-post-body">
-        <p>Québec's video game industry didn't happen by accident. It was built over four decades by thousands of developers, artists, designers, and entrepreneurs who chose to bet on games as a legitimate cultural and economic force.</p>
-        <p>The story often begins in 1997, when Ubisoft opened its Montréal studio — a landmark moment that proved Québec could compete at the highest level of global game development. That bet paid off spectacularly: Ubisoft Montréal became one of the largest game studios in the world, home to some of the industry's most iconic franchises.</p>
-        <p>But the real story is broader. In 2003, La Guilde du jeu vidéo du Québec was founded to support and unite the growing ecosystem — from giants like Eidos-Montréal and WB Games Montréal to indie powerhouses like Sabotage Studio, Thunder Lotus, and Red Barrels. Today, the province is home to over 200 studios, generating more than 1.4 billion dollars in annual revenue and employing over 14,000 people.</p>
-        <p>Games from Québec is a testament to that story — and a commitment to keeping it growing.</p>
-      </div>
-      <a class="blog-read-more" href="#">Read Full Post <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-    </article>
-
+  <div class="blog-wrap" id="blogPostsList">
+    <p style="color:var(--muted);padding:40px 0">Loading posts…</p>
   </div>
 </div>
 
@@ -1007,6 +974,39 @@ nav.nav-open .nav-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 
 <script>
 /* ═══════════════════════════════════════
+   BLOG RENDERING
+═══════════════════════════════════════ */
+async function renderBlogPage() {
+  const wrap = document.getElementById('blogPostsList');
+  wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Loading posts…</p>';
+  try {
+    const res = await fetch('_posts/index.json');
+    const posts = await res.json();
+    const visible = posts.filter(p => !p.draft);
+    if (!visible.length) {
+      wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">No posts yet.</p>';
+      return;
+    }
+    const arrowSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+    wrap.innerHTML = visible.map((p, i) => `
+      <article class="blog-post reveal" style="transition-delay:${i * 0.1}s">
+        <div class="blog-post-eyebrow">${p.category}</div>
+        <h2 class="blog-post-title">${p.title}</h2>
+        <div class="blog-post-meta">
+          <span>${p.date}</span>
+          <div class="blog-post-meta-dot"></div>
+          <span>${p.author}</span>
+        </div>
+        <div class="blog-post-body"><p>${p.excerpt}</p></div>
+        <a class="blog-read-more" href="#">Read Full Post ${arrowSVG}</a>
+      </article>`).join('');
+    observeReveal();
+  } catch(e) {
+    wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Could not load posts.</p>';
+  }
+}
+
+/* ═══════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════ */
 let jobsInitialized = false;
@@ -1034,72 +1034,26 @@ function navigate(page) {
   if (page === 'games') renderGamesPage();
   if (page === 'studios') renderStudiosPage();
   if (page === 'jobs' && !jobsInitialized) { jobsInitialized = true; runSearch(); }
+  if (page === 'blog') renderBlogPage();
 }
 
 /* ═══════════════════════════════════════
-   STUDIOS DATA
+   DATA LOADING
 ═══════════════════════════════════════ */
-const studios = [
-  {name:"Behaviour Interactive",city:"Montréal",desc:"One of Canada's largest independent studios, creator of the landmark asymmetrical horror franchise Dead by Daylight — a cultural phenomenon with tens of millions of players worldwide.",website:"https://www.bhvr.com",games:["Dead by Daylight","Meet Your Maker"]},
-  {name:"Sabotage Studio",city:"Québec City",desc:"Award-winning boutique studio crafting games with the soul of 90s classics. Sea of Stars won the BAFTA for Best Game and became one of the most celebrated indie RPGs in years.",website:"https://www.sabotagestudio.com",games:["Sea of Stars","The Messenger"]},
-  {name:"Thunder Lotus Games",city:"Montréal",desc:"Hand-crafted games with deeply emotional narratives. Spiritfarer reframed how games can handle grief, reaching millions with its heartfelt management mechanics.",website:"https://thunderlotusgames.com",games:["Spiritfarer","Jotun","Sundered"]},
-  {name:"Eidos-Montréal",city:"Montréal",desc:"A global AAA powerhouse behind the Deus Ex and Tomb Raider legacy, and Marvel's Guardians of the Galaxy — a franchise-defining critical darling.",website:"https://eidosmontreal.com",games:["Deus Ex: Mankind Divided","Shadow of the Tomb Raider"]},
-  {name:"Ubisoft Montréal",city:"Montréal",desc:"One of the world's largest game studios and the creative engine behind Assassin's Creed, Far Cry, and Watch Dogs. A cornerstone of Québec's game industry since 1997.",website:"https://montreal.ubisoft.com",games:["Assassin's Creed","Far Cry 4","Watch Dogs"]},
-  {name:"Ubisoft Québec",city:"Québec City",desc:"The studio behind Assassin's Creed Syndicate and Odyssey — known for pushing the boundaries of open-world storytelling in the iconic franchise.",website:"https://quebec.ubisoft.com",games:["Assassin's Creed Syndicate","Assassin's Creed Odyssey"]},
-  {name:"WB Games Montréal",city:"Montréal",desc:"Creator of Batman: Arkham Origins and Gotham Knights — a studio with deep expertise in building open-world action games set in beloved DC universes.",website:"https://wbgamesmontreal.com",games:["Batman: Arkham Origins","Gotham Knights"]},
-  {name:"Red Barrels",city:"Montréal",desc:"A veteran-founded indie studio specializing in survival horror. The Outlast series set a new bar for first-person horror and has sold millions of copies worldwide.",website:"https://www.redbarrelsgames.com",games:["Outlast","Outlast 2","The Outlast Trials"]},
-  {name:"Compulsion Games",city:"Montréal",desc:"A creative indie studio known for atmospheric, narrative-driven games. We Happy Few's darkly comic alternate-history world earned global critical acclaim.",website:"https://compulsiongames.com",games:["We Happy Few","Contrast"]},
-  {name:"Panache Digital Games",city:"Montréal",desc:"Founded by the creator of Assassin's Creed, Panache explores uncharted territory with games rooted in humanity's deep history and survival instincts.",website:"https://panachedigital.com",games:["Ancestors: The Humankind Odyssey"]},
-  {name:"Square Enix Montréal",city:"Montréal",desc:"A mobile and puzzle-focused studio renowned for reimagining AAA franchises as elegant, turn-based puzzle experiences that earned global awards.",website:"https://www.se-montreal.com",games:["Hitman GO","Lara Croft GO","Deus Ex GO"]},
-  {name:"Gameloft",city:"Montréal",desc:"A global mobile gaming leader with a Montréal hub producing high-quality titles across racing, action, and adventure genres played by hundreds of millions.",website:"https://www.gameloft.com",games:["Asphalt 9","Modern Combat 5","Disney Magic Kingdoms"]},
-  {name:"Clever Endeavour Games",city:"Montréal",desc:"A small, passionate studio behind Ultimate Chicken Horse — a party game phenomenon beloved for its chaotic creativity and its thriving competitive community.",website:"https://www.cleverendeavour.com",games:["Ultimate Chicken Horse"]},
-  {name:"Nine Dots Studio",city:"Montréal",desc:"An independent studio dedicated to deep, challenging open-world RPGs that respect the player's intelligence and reward exploration and perseverance.",website:"https://ninedotsstudio.com",games:["Outward","Outward: Definitive Edition"]},
-  {name:"Scavengers Studio",city:"Montréal",desc:"A thoughtful independent studio whose meditative game SEASON: A Letter to the Future earned universal praise for its unique approach to storytelling and world-building.",website:"https://scavengersstudio.com",games:["SEASON: A Letter to the Future"]},
-];
+let games = [];
+let studios = [];
 
-/* ═══════════════════════════════════════
-   GAMES DATA + GRID
-═══════════════════════════════════════ */
-const games = [
-  // ── Already listed ──────────────────────────────────────────────
-  {title:"Dead by Daylight",studio:"Behaviour Interactive",genre:"Horror",desc:"Asymmetrical multiplayer horror where one Killer hunts four Survivors. A global phenomenon with tens of millions of players.",color:["#200a0a","#3d0d0d"],emoji:"🩸"},
-  {title:"Sea of Stars",studio:"Sabotage Studio",genre:"RPG",desc:"A BAFTA-winning turn-based RPG inspired by 90s classics, blending stunning pixel art with tactical combat.",color:["#0a0d20","#0d1a2e"],emoji:"🌊"},
-  {title:"Spiritfarer",studio:"Thunder Lotus",genre:"Adventure",desc:"A cozy management game about dying. Build a boat, explore the world, and help spirits pass on in this emotional masterpiece.",color:["#0a1a14","#0d2010"],emoji:"⛵"},
-  {title:"The Messenger",studio:"Sabotage Studio",genre:"Action",desc:"A side-scrolling action platformer about a ninja carrying a scroll through a cursed world, shifting between 8-bit and 16-bit eras.",color:["#0a0a20","#10081a"],emoji:"🥷"},
-  {title:"We Happy Few",studio:"Compulsion Games",genre:"Action",desc:"Survival action set in a drug-fuelled, darkly comic alternate 1960s England where conformity is enforced at all costs.",color:["#1a150a","#28200a"],emoji:"😊"},
-  {title:"Outlast",studio:"Red Barrels",genre:"Horror",desc:"A true survival horror experience set in a remote psychiatric hospital, where your only option is to run and hide.",color:["#160a0a","#200d0d"],emoji:"📷"},
-  {title:"Ancestors: The Humankind Odyssey",studio:"Panache Jeux Numériques",genre:"Adventure",desc:"A third-person open world survival game spanning 10 million years of human evolution.",color:["#0a1408","#0d1e0a"],emoji:"🦴"},
-  {title:"Bloodroots",studio:"Paper Cult",genre:"Action",desc:"An ultraviolent action game where every object in the world is a weapon. A bloody ballet of improvisation and instinct.",color:["#1a0808","#250a0a"],emoji:"🪓"},
-  {title:"Ship of Fools",studio:"Fika Productions",genre:"Roguelike",desc:"A cooperative roguelite set in a marine universe. Two Fools aboard a ship, braving the Everlasting Storm.",color:["#080d1a","#0a1225"],emoji:"🚢"},
-  {title:"Ultimate Chicken Horse",studio:"Clever Endeavour",genre:"Co-op",desc:"A party platformer where you build the level as you play, placing traps to stop your friends.",color:["#0a1a0a","#0d200d"],emoji:"🐔"},
-  {title:"Foundation",studio:"Polymorph Games",genre:"Strategy",desc:"A grid-less sprawling medieval city builder with organic development and monument construction.",color:["#14100a","#1e1808"],emoji:"🏰"},
-  {title:"Outward",studio:"Nine Dots Studio",genre:"RPG",desc:"An open-world RPG with punishing survival elements — cold nights, harsh weather, and a world that doesn't care if you live.",color:["#0a0e14","#0d121e"],emoji:"⚔️"},
-  {title:"Deceive Inc.",studio:"Sweet Bandits Studios",genre:"Action",desc:"Go undercover as a world-class spy in this tense multiplayer game of subterfuge. Disguise, deceive, and eliminate.",color:["#10080a","#1a0d10"],emoji:"🕵️"},
-  {title:"Subaeria",studio:"iLLOGIKA",genre:"Roguelike",desc:"An intense action puzzler with roguelike elements. Use your wits to manipulate enemies into destroying each other.",color:["#080a16","#0a0d20"],emoji:"🎯"},
-  {title:"Knight Squad 2",studio:"Chainsawesome Games",genre:"Co-op",desc:"An 8-player arcade multiplayer mixing Bomberman with Gauntlet across 13 chaotic game modes.",color:["#10080e","#18091a"],emoji:"⚔️"},
-  {title:"SEASON: A Letter to the Future",studio:"Scavengers Studio",genre:"Adventure",desc:"A young woman leaves her secluded village to document a world on the cusp of an apocalypse.",color:["#0a100e","#0d1814"],emoji:"🍂"},
-  {title:"Jotun: Valhalla Edition",studio:"Thunder Lotus",genre:"Action",desc:"Hand-drawn action-exploration set in Norse mythology. Play Thora, a Viking warrior who must prove herself to the gods.",color:["#0a0810","#100a18"],emoji:"⚡"},
-  {title:"Castle Story",studio:"Sauropod Studio",genre:"Strategy",desc:"A creative voxel-based strategy game where you build castles one brick at a time and defend them from monsters.",color:["#0a0e14","#0d1420"],emoji:"🧱"},
-  // ── From gamesfromquebec.com ─────────────────────────────────────
-  {title:"Batman: Arkham Origins",studio:"WB Games Montréal",genre:"Action",desc:"Set years before Arkham Asylum, this prequel follows a young Batman facing assassins on a bounty — including his first encounter with the Joker.",color:["#0a0a14","#14141e"],emoji:"🦇"},
-  {title:"Assassin's Creed Syndicate",studio:"Ubisoft Québec",genre:"Action",desc:"Take back Victorian London as twins Jacob and Evie Frye, building a criminal empire to fight the Templar stranglehold on the city.",color:["#14100a","#20180a"],emoji:"🗡️"},
-  {title:"Far Cry 4",studio:"Ubisoft Montréal",genre:"Action",desc:"Stranded in the fictional Himalayan kingdom of Kyrat, you must navigate a civil war and the eccentric cruelty of self-appointed king Pagan Min.",color:["#0d1a0a","#1a2810"],emoji:"🏔️"},
-  {title:"Deus Ex: Human Revolution",studio:"Eidos-Montréal",genre:"RPG",desc:"A groundbreaking action-RPG set in cyberpunk 2027, where augmented security expert Adam Jensen investigates a conspiracy that could change humanity forever.",color:["#1a1408","#2a2010"],emoji:"🦾"},
-  {title:"Deus Ex: Mankind Divided",studio:"Eidos-Montréal",genre:"RPG",desc:"Two years after Human Revolution, Adam Jensen navigates a world of augmentation apartheid to uncover a deeper, world-threatening conspiracy.",color:["#141008","#201808"],emoji:"🦿"},
-  {title:"Hellpoint",studio:"Cradle Games",genre:"Action",desc:"A dark multiplayer action RPG set in the aftermath of a quantum cataclysm aboard a space station orbiting a black hole, filled with occult horrors.",color:["#0a0810","#16081e"],emoji:"⚫"},
-  {title:"Hitman GO",studio:"Square Enix Montréal",genre:"Puzzle",desc:"A turn-based puzzle game where Agent 47 navigates elegant diorama-style set pieces on a grid — strategy and precision over brute force.",color:["#100a0a","#1e1010"],emoji:"🎯"},
-  {title:"Lara Croft GO",studio:"Square Enix Montréal",genre:"Puzzle",desc:"A turn-based puzzle-adventure set in a long-forgotten world. Navigate treacherous labyrinths and solve ancient mysteries as Lara Croft.",color:["#0a0e10","#10181a"],emoji:"🏺"},
-  {title:"Deus Ex GO",studio:"Square Enix Montréal",genre:"Puzzle",desc:"A turn-based puzzle infiltration game set in a stylised Deus Ex universe, placing Agent Jensen in covert missions solved through strategy.",color:["#100e08","#201a08"],emoji:"🤖"},
-  {title:"Hitman: Sniper",studio:"Square Enix Montréal",genre:"Action",desc:"Take on contracts as Agent 47 armed only with a sniper rifle, using creativity and precision from a fixed vantage point to eliminate targets.",color:["#0a0c10","#10121a"],emoji:"🔭"},
-  {title:"Legends of Ethernal",studio:"Lucid Dreams Studio",genre:"Adventure",desc:"A 2D action-adventure with hand-crafted environments, clever puzzles, and a rich world to explore as you search for your missing parents.",color:["#0a0e18","#0d1428"],emoji:"🌿"},
-  {title:"Stories: The Path of Destinies",studio:"Spearhead Games",genre:"RPG",desc:"An action-RPG in a fairytale world of rebels and sky-pirates where every choice branches the story — play all paths to uncover the true ending.",color:["#0e080a","#18100c"],emoji:"📖"},
-  {title:"Rise of Madness",studio:"Hibernum Créations",genre:"Strategy",desc:"A zombie survival game set in 1840 Montréal. Manage a desperate community, build shelter, scavenge resources, and search for a cure.",color:["#120808","#1e0c0c"],emoji:"🧟"},
-  {title:"Epic Manager",studio:"ManaVoid Entertainment",genre:"Strategy",desc:"A unique mashup of sports management simulation and classic JRPGs — recruit heroes, build a team, and compete in adventurers' leagues.",color:["#0c1008","#141a0a"],emoji:"🏆"},
-  {title:"Zombiotik",studio:"Studio Shrub",genre:"Co-op",desc:"A chaotic 3D local multiplayer game for up to 8 players based on zombie tag — the last human standing wins.",color:["#0c0e08","#181e0c"],emoji:"🧠"},
-  {title:"Prison Boss VR",studio:"Ultimerse",genre:"Adventure",desc:"A VR crafting and trading game where your play space becomes a jail cell. Craft contraband, build a reputation, and don't get caught by the guards.",color:["#0c0c0c","#181818"],emoji:"🔒"},
-  {title:"Therian Saga",studio:"Virtys",genre:"RPG",desc:"A rich browser-based MMORPG that stands apart from the crowd, offering deep crafting systems, trade networks, and a living world to explore.",color:["#080e14","#0c1420"],emoji:"🐺"},
-];
-
+async function loadData() {
+  const [gamesRes, studiosRes] = await Promise.all([
+    fetch('_data/games.json'),
+    fetch('_data/studios.json')
+  ]);
+  games = await gamesRes.json();
+  studios = await studiosRes.json();
+  renderHomeGames();
+  renderHomeStudios();
+  observeReveal();
+}
 const marqueeGames = ["DEAD BY DAYLIGHT","SEA OF STARS","SPIRITFARER","THE MESSENGER","WE HAPPY FEW","OUTLAST","BLOODROOTS","FOUNDATION","OUTWARD","ANCESTORS","SHIP OF FOOLS","ULTIMATE CHICKEN HORSE","DECEIVE INC.","KNIGHT SQUAD 2","BATMAN: ARKHAM ORIGINS","ASSASSIN'S CREED SYNDICATE","FAR CRY 4","DEUS EX: MANKIND DIVIDED","HITMAN GO","HELLPOINT","LARA CROFT GO"];
 
 // Marquee fill
@@ -1115,7 +1069,7 @@ function gameRowHTML(g, i) {
   return `
   <div class="game-row ${rev} reveal" style="transition-delay:${i*.04}s">
     <div class="game-row-body">
-      <div class="game-row-image" style="background:linear-gradient(135deg,${g.color[0]},${g.color[1]})">
+      <div class="game-row-image" style="background:linear-gradient(135deg,${g.color_from},${g.color_to})">
         <div class="game-row-img-inner"><span class="row-emoji">${g.emoji}</span></div>
       </div>
       <div class="game-row-content">
@@ -1226,8 +1180,7 @@ document.getElementById('navBurger').addEventListener('click', () => {
   document.getElementById('mainNav').classList.toggle('nav-open');
 });
 
-renderHomeGames();
-renderHomeStudios();
+loadData();
 observeReveal();
 
 </script>

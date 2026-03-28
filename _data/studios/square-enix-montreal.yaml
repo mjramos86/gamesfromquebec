@@ -1,0 +1,8 @@
+name: "Square Enix Montréal"
+city: "Montréal"
+desc: "A mobile and puzzle-focused studio renowned for reimagining AAA franchises as elegant, turn-based puzzle experiences that earned global awards."
+website: https://www.se-montreal.com
+games:
+  - Hitman GO
+  - Lara Croft GO
+  - Deus Ex GO

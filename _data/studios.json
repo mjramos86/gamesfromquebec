@@ -1,0 +1,154 @@
+[
+  {
+    "name": "Behaviour Interactive",
+    "city": "Montréal",
+    "desc": "One of Canada's largest independent studios, creator of the landmark asymmetrical horror franchise Dead by Daylight — a cultural phenomenon with tens of millions of players worldwide.",
+    "website": "https://www.bhvr.com",
+    "games": [
+      "Dead by Daylight",
+      "Meet Your Maker"
+    ]
+  },
+  {
+    "name": "Clever Endeavour Games",
+    "city": "Montréal",
+    "desc": "A small, passionate studio behind Ultimate Chicken Horse — a party game phenomenon beloved for its chaotic creativity and its thriving competitive community.",
+    "website": "https://www.cleverendeavour.com",
+    "games": [
+      "Ultimate Chicken Horse"
+    ]
+  },
+  {
+    "name": "Compulsion Games",
+    "city": "Montréal",
+    "desc": "A creative indie studio known for atmospheric, narrative-driven games. We Happy Few's darkly comic alternate-history world earned global critical acclaim.",
+    "website": "https://compulsiongames.com",
+    "games": [
+      "We Happy Few",
+      "Contrast"
+    ]
+  },
+  {
+    "name": "Eidos-Montréal",
+    "city": "Montréal",
+    "desc": "A global AAA powerhouse behind the Deus Ex and Tomb Raider legacy, and Marvel's Guardians of the Galaxy — a franchise-defining critical darling.",
+    "website": "https://eidosmontreal.com",
+    "games": [
+      "Deus Ex: Mankind Divided",
+      "Shadow of the Tomb Raider"
+    ]
+  },
+  {
+    "name": "Gameloft",
+    "city": "Montréal",
+    "desc": "A global mobile gaming leader with a Montréal hub producing high-quality titles across racing, action, and adventure genres played by hundreds of millions.",
+    "website": "https://www.gameloft.com",
+    "games": [
+      "Asphalt 9",
+      "Modern Combat 5",
+      "Disney Magic Kingdoms"
+    ]
+  },
+  {
+    "name": "Nine Dots Studio",
+    "city": "Montréal",
+    "desc": "An independent studio dedicated to deep, challenging open-world RPGs that respect the player's intelligence and reward exploration and perseverance.",
+    "website": "https://ninedotsstudio.com",
+    "games": [
+      "Outward",
+      "Outward: Definitive Edition"
+    ]
+  },
+  {
+    "name": "Panache Digital Games",
+    "city": "Montréal",
+    "desc": "Founded by the creator of Assassin's Creed, Panache explores uncharted territory with games rooted in humanity's deep history and survival instincts.",
+    "website": "https://panachedigital.com",
+    "games": [
+      "Ancestors: The Humankind Odyssey"
+    ]
+  },
+  {
+    "name": "Red Barrels",
+    "city": "Montréal",
+    "desc": "A veteran-founded indie studio specializing in survival horror. The Outlast series set a new bar for first-person horror and has sold millions of copies worldwide.",
+    "website": "https://www.redbarrelsgames.com",
+    "games": [
+      "Outlast",
+      "Outlast 2",
+      "The Outlast Trials"
+    ]
+  },
+  {
+    "name": "Sabotage Studio",
+    "city": "Québec City",
+    "desc": "Award-winning boutique studio crafting games with the soul of 90s classics. Sea of Stars won the BAFTA for Best Game and became one of the most celebrated indie RPGs in years.",
+    "website": "https://www.sabotagestudio.com",
+    "games": [
+      "Sea of Stars",
+      "The Messenger"
+    ]
+  },
+  {
+    "name": "Scavengers Studio",
+    "city": "Montréal",
+    "desc": "A thoughtful independent studio whose meditative game SEASON: A Letter to the Future earned universal praise for its unique approach to storytelling and world-building.",
+    "website": "https://scavengersstudio.com",
+    "games": [
+      "SEASON: A Letter to the Future"
+    ]
+  },
+  {
+    "name": "Square Enix Montréal",
+    "city": "Montréal",
+    "desc": "A mobile and puzzle-focused studio renowned for reimagining AAA franchises as elegant, turn-based puzzle experiences that earned global awards.",
+    "website": "https://www.se-montreal.com",
+    "games": [
+      "Hitman GO",
+      "Lara Croft GO",
+      "Deus Ex GO"
+    ]
+  },
+  {
+    "name": "Thunder Lotus Games",
+    "city": "Montréal",
+    "desc": "Hand-crafted games with deeply emotional narratives. Spiritfarer reframed how games can handle grief, reaching millions with its heartfelt management mechanics.",
+    "website": "https://thunderlotusgames.com",
+    "games": [
+      "Spiritfarer",
+      "Jotun",
+      "Sundered"
+    ]
+  },
+  {
+    "name": "Ubisoft Montréal",
+    "city": "Montréal",
+    "desc": "One of the world's largest game studios and the creative engine behind Assassin's Creed, Far Cry, and Watch Dogs. A cornerstone of Québec's game industry since 1997.",
+    "website": "https://montreal.ubisoft.com",
+    "games": [
+      "Assassin's Creed",
+      "Far Cry 4",
+      "Watch Dogs"
+    ]
+  },
+  {
+    "name": "Ubisoft Québec",
+    "city": "Québec City",
+    "desc": "The studio behind Assassin's Creed Syndicate and Odyssey — known for pushing the boundaries of open-world storytelling in the iconic franchise.",
+    "website": "https://quebec.ubisoft.com",
+    "games": [
+      "Assassin's Creed Syndicate",
+      "Assassin's Creed Odyssey"
+    ]
+  },
+  {
+    "name": "WB Games Montréal",
+    "city": "Montréal",
+    "desc": "Creator of Batman: Arkham Origins and Gotham Knights — a studio with deep expertise in building open-world action games set in beloved DC universes.",
+    "website": "https://wbgamesmontreal.com",
+    "games": [
+      "Batman: Arkham Origins",
+      "Gotham Knights"
+    ]
+  }
+]

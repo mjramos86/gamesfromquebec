@@ -1,0 +1,8 @@
+name: "Ubisoft Montréal"
+city: "Montréal"
+desc: "One of the world's largest game studios and the creative engine behind Assassin's Creed, Far Cry, and Watch Dogs. A cornerstone of Québec's game industry since 1997."
+website: https://montreal.ubisoft.com
+games:
+  - "Assassin's Creed"
+  - Far Cry 4
+  - Watch Dogs

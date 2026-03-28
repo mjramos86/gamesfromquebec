@@ -1,0 +1,95 @@
+name: Regenerate JSON Data
+
+on:
+  push:
+    paths:
+      - '_data/games/**'
+      - '_data/studios/**'
+      - '_posts/**'
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Generate games.json
+        run: |
+          python3 << 'EOF'
+          import json, yaml, glob
+          games = []
+          for f in sorted(glob.glob('_data/games/*.yaml') + glob.glob('_data/games/*.yml')):
+              with open(f) as fh:
+                  data = yaml.safe_load(fh)
+                  if data:
+                      games.append(data)
+          with open('_data/games.json', 'w', encoding='utf-8') as fh:
+              json.dump(games, fh, ensure_ascii=False, indent=2)
+          print(f"Generated games.json with {len(games)} entries")
+          EOF
+
+      - name: Generate studios.json
+        run: |
+          python3 << 'EOF'
+          import json, yaml, glob
+          studios = []
+          for f in sorted(glob.glob('_data/studios/*.yaml') + glob.glob('_data/studios/*.yml')):
+              with open(f) as fh:
+                  data = yaml.safe_load(fh)
+                  if data:
+                      studios.append(data)
+          with open('_data/studios.json', 'w', encoding='utf-8') as fh:
+              json.dump(studios, fh, ensure_ascii=False, indent=2)
+          print(f"Generated studios.json with {len(studios)} entries")
+          EOF
+
+      - name: Update posts index.json
+        run: |
+          python3 << 'EOF'
+          import json, yaml, re, glob, os
+          from datetime import datetime
+
+          posts = []
+          for f in sorted(glob.glob('_posts/*.md'), reverse=True):
+              with open(f) as fh:
+                  raw = fh.read()
+              # Parse YAML frontmatter between --- delimiters
+              m = re.match(r'^---\s*\n(.*?)\n---\s*\n(.*)', raw, re.DOTALL)
+              if not m:
+                  continue
+              fm = yaml.safe_load(m.group(1))
+              body = m.group(2).strip()
+              # First paragraph as excerpt
+              first_para = next((p.strip() for p in body.split('\n\n') if p.strip()), '')
+              slug = os.path.basename(f)[:-3]
+              date = fm.get('date', '')
+              if hasattr(date, 'strftime'):
+                  date_display = date.strftime('%B %-d, %Y')
+              else:
+                  date_display = str(date)
+              posts.append({
+                  'slug': slug,
+                  'title': fm.get('title', ''),
+                  'date': date_display,
+                  'author': fm.get('author', ''),
+                  'category': fm.get('category', ''),
+                  'draft': fm.get('draft', False),
+                  'excerpt': first_para,
+              })
+          with open('_posts/index.json', 'w', encoding='utf-8') as fh:
+              json.dump(posts, fh, ensure_ascii=False, indent=2)
+          print(f"Generated posts/index.json with {len(posts)} entries")
+          EOF
+
+      - name: Commit updated files
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add _data/games.json _data/studios.json _posts/index.json
+          git diff --staged --quiet || git commit -m "auto: regenerate JSON data files [skip ci]"
+          git push
