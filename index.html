@@ -971,7 +971,7 @@ nav.nav-open .nav-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 
 </div><!-- end page-jobs -->
 
-
+<script src="_data/data.js"></script>
 <script>
 /* ═══════════════════════════════════════
    BLOG RENDERING
@@ -1038,22 +1038,10 @@ function navigate(page) {
 }
 
 /* ═══════════════════════════════════════
-   DATA LOADING
+   DATA
 ═══════════════════════════════════════ */
-let games = [];
-let studios = [];
-
-async function loadData() {
-  const [gamesRes, studiosRes] = await Promise.all([
-    fetch('_data/games.json'),
-    fetch('_data/studios.json')
-  ]);
-  games = await gamesRes.json();
-  studios = await studiosRes.json();
-  renderHomeGames();
-  renderHomeStudios();
-  observeReveal();
-}
+const games = window.GAMES_DATA || [];
+const studios = window.STUDIOS_DATA || [];
 const marqueeGames = ["DEAD BY DAYLIGHT","SEA OF STARS","SPIRITFARER","THE MESSENGER","WE HAPPY FEW","OUTLAST","BLOODROOTS","FOUNDATION","OUTWARD","ANCESTORS","SHIP OF FOOLS","ULTIMATE CHICKEN HORSE","DECEIVE INC.","KNIGHT SQUAD 2","BATMAN: ARKHAM ORIGINS","ASSASSIN'S CREED SYNDICATE","FAR CRY 4","DEUS EX: MANKIND DIVIDED","HITMAN GO","HELLPOINT","LARA CROFT GO"];
 
 // Marquee fill
@@ -1180,7 +1168,8 @@ document.getElementById('navBurger').addEventListener('click', () => {
   document.getElementById('mainNav').classList.toggle('nav-open');
 });
 
-loadData();
+renderHomeGames();
+renderHomeStudios();
 observeReveal();
 
 </script>
