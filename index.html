@@ -77,7 +77,7 @@ nav {
    HERO BANNER
 ═══════════════════════════════════════════ */
 .hero{
-  position:relative;height:400px;margin-top:64px;
+  position:relative;height:640px;margin-top:64px;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
@@ -94,7 +94,7 @@ nav {
 }
 .hero-logo{
   position:relative;z-index:2;
-  max-height:300px;width:auto;
+  max-height:600px;width:auto;
   display:block;
 }
 /* PAGE TITLE BAR */
@@ -650,6 +650,49 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 
 
 <!-- ═══════════════════════════════════════════
+     PAGE: GAMES
+═══════════════════════════════════════════ -->
+<div id="page-games" class="page">
+  <section class="games-section">
+    <div class="filters-wrap">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">Catalogue</div>
+          <div class="section-title">ALL GAMES</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="section-count" id="gamesPageCount"></div>
+          <div class="sort-wrap">
+            <span class="sort-label">Sort</span>
+            <select class="sort-select" id="gamesPageSort" onchange="renderGamesPage()">
+              <option value="default">Default</option>
+              <option value="alpha">A &rarr; Z</option>
+              <option value="alpha-desc">Z &rarr; A</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="filters" id="gamesPageFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Action">Action</button>
+        <button class="filter-btn" data-filter="RPG">RPG</button>
+        <button class="filter-btn" data-filter="Roguelike">Roguelike</button>
+        <button class="filter-btn" data-filter="Horror">Horror</button>
+        <button class="filter-btn" data-filter="Strategy">Strategy</button>
+        <button class="filter-btn" data-filter="Adventure">Adventure</button>
+        <button class="filter-btn" data-filter="Puzzle">Puzzle</button>
+        <button class="filter-btn" data-filter="Co-op">Co-op</button>
+      </div>
+    </div>
+    <div class="games-list" id="gamesPageList"></div>
+    <div class="load-more-wrap">
+      <button class="btn-load" id="gamesPageLoadMore" style="display:none">Load More Games</button>
+    </div>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
      PAGE: JOBS
 ═══════════════════════════════════════════ -->
 <div id="page-jobs" class="page">
@@ -786,19 +829,19 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
    NAVIGATION
 ═══════════════════════════════════════ */
 let jobsInitialized = false;
-const pageTitles = { jobs: 'THE JOBS' };
+const pageTitles = { games: 'THE GAMES', jobs: 'THE JOBS' };
 
 function navigate(page) {
-  // The Games and The Studios scroll to sections on home (dedicated pages coming soon)
-  if (page === 'games' || page === 'studios') {
+  // Studios still scrolls to home section (dedicated page not built yet)
+  if (page === 'studios') {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-home').classList.add('active');
     document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    const navEl = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
+    const navEl = document.getElementById('navStudios');
     if (navEl) navEl.classList.add('active');
     document.getElementById('page-title-bar').classList.remove('visible');
     setTimeout(() => {
-      const el = document.getElementById('section-' + page);
+      const el = document.getElementById('section-studios');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }, 50);
     return;
@@ -821,6 +864,7 @@ function navigate(page) {
     titleBar.classList.remove('visible');
   }
 
+  if (page === 'games') renderGamesPage();
   if (page === 'jobs' && !jobsInitialized) { jobsInitialized = true; runSearch(); }
 }
 
@@ -940,6 +984,39 @@ function renderHomeStudios() {
   `).join('');
   observeReveal();
 }
+
+/* ═══════════════════════════════════════
+   GAMES PAGE
+═══════════════════════════════════════ */
+let gamesPageFilter = 'all';
+let gamesPageVisible = 9;
+
+function renderGamesPage() {
+  const sortVal = document.getElementById('gamesPageSort').value;
+  let filtered = gamesPageFilter === 'all' ? [...games] : games.filter(g => g.genre === gamesPageFilter);
+  if (sortVal === 'alpha') filtered.sort((a, b) => a.title.localeCompare(b.title));
+  else if (sortVal === 'alpha-desc') filtered.sort((a, b) => b.title.localeCompare(a.title));
+  const toShow = filtered.slice(0, gamesPageVisible);
+  document.getElementById('gamesPageCount').textContent = `Showing ${toShow.length} of ${filtered.length} games`;
+  document.getElementById('gamesPageList').innerHTML = toShow.map((g, i) => gameRowHTML(g, i)).join('');
+  document.getElementById('gamesPageLoadMore').style.display = filtered.length > gamesPageVisible ? 'block' : 'none';
+  observeReveal();
+}
+
+document.getElementById('gamesPageFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('#gamesPageFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  gamesPageFilter = btn.dataset.filter;
+  gamesPageVisible = 9;
+  renderGamesPage();
+});
+
+document.getElementById('gamesPageLoadMore').addEventListener('click', () => {
+  gamesPageVisible += 6;
+  renderGamesPage();
+});
 
 /* ═══════════════════════════════════════
    SCROLL REVEAL
