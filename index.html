@@ -50,6 +50,13 @@ nav {
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
 }
+.nav-home{
+  font-family:var(--font-display);font-size:20px;letter-spacing:.06em;
+  color:var(--text);background:none;border:none;cursor:pointer;
+  padding:0;transition:color .2s;flex-shrink:0;
+}
+.nav-home span{color:var(--cyan);}
+.nav-home:hover{color:rgba(255,255,255,.7);}
 .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
 .nav-links a{
   font-family:var(--font-ui);font-size:12px;font-weight:700;
@@ -552,6 +559,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
      NAV (shared)
 ═══════════════════════════════════════════ -->
 <nav id="mainNav">
+  <button class="nav-home" onclick="navigate('home')" aria-label="Home">GAMES<span>·</span>QC</button>
   <ul class="nav-links">
     <li><a id="navGames" onclick="navigate('games')">The Games</a></li>
     <li><a id="navStudios" onclick="navigate('studios')">The Studios</a></li>
