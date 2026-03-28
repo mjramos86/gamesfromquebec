@@ -650,6 +650,33 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 
 
 <!-- ═══════════════════════════════════════════
+     PAGE: STUDIOS
+═══════════════════════════════════════════ -->
+<div id="page-studios" class="page">
+  <div class="featured-section">
+    <div class="section-header" style="padding:0;margin-bottom:0">
+      <div>
+        <div class="section-eyebrow">The Industry</div>
+        <div class="section-title">ALL STUDIOS</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="section-count" id="studiosPageCount"></div>
+        <div class="sort-wrap">
+          <span class="sort-label">Sort</span>
+          <select class="sort-select" id="studiosPageSort" onchange="renderStudiosPage()">
+            <option value="default">Default</option>
+            <option value="alpha">A &rarr; Z</option>
+            <option value="alpha-desc">Z &rarr; A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="featured-grid" id="studiosPageList"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
      PAGE: GAMES
 ═══════════════════════════════════════════ -->
 <div id="page-games" class="page">
@@ -829,24 +856,9 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
    NAVIGATION
 ═══════════════════════════════════════ */
 let jobsInitialized = false;
-const pageTitles = { games: 'THE GAMES', jobs: 'THE JOBS' };
+const pageTitles = { games: 'THE GAMES', studios: 'THE STUDIOS', jobs: 'THE JOBS' };
 
 function navigate(page) {
-  // Studios still scrolls to home section (dedicated page not built yet)
-  if (page === 'studios') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-home').classList.add('active');
-    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    const navEl = document.getElementById('navStudios');
-    if (navEl) navEl.classList.add('active');
-    document.getElementById('page-title-bar').classList.remove('visible');
-    setTimeout(() => {
-      const el = document.getElementById('section-studios');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 50);
-    return;
-  }
-
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -865,6 +877,7 @@ function navigate(page) {
   }
 
   if (page === 'games') renderGamesPage();
+  if (page === 'studios') renderStudiosPage();
   if (page === 'jobs' && !jobsInitialized) { jobsInitialized = true; runSearch(); }
 }
 
@@ -975,6 +988,28 @@ function renderHomeStudios() {
   document.getElementById('homeStudiosList').innerHTML = shuffled.slice(0, 5).map((s, i) => `
     <div class="featured-card reveal" style="transition-delay:${i*.1}s">
       <div class="featured-num">${nums[i]}</div>
+      <div class="featured-studio-loc">${s.city}, QC</div>
+      <div class="featured-studio-name">${s.name.toUpperCase()}</div>
+      <p class="featured-studio-desc">${s.desc}</p>
+      <ul class="featured-games-list">${s.games.map(g => `<li class="featured-game-item">${g}</li>`).join('')}</ul>
+      <a class="studio-website-link" href="${s.website}" target="_blank" rel="noopener">Visit Website &rarr;</a>
+    </div>
+  `).join('');
+  observeReveal();
+}
+
+/* ═══════════════════════════════════════
+   STUDIOS PAGE
+═══════════════════════════════════════ */
+function renderStudiosPage() {
+  const sortVal = document.getElementById('studiosPageSort').value;
+  let sorted = [...studios];
+  if (sortVal === 'alpha') sorted.sort((a, b) => a.name.localeCompare(b.name));
+  else if (sortVal === 'alpha-desc') sorted.sort((a, b) => b.name.localeCompare(a.name));
+  document.getElementById('studiosPageCount').textContent = `${sorted.length} studios`;
+  document.getElementById('studiosPageList').innerHTML = sorted.map((s, i) => `
+    <div class="featured-card reveal" style="transition-delay:${(i % 6) * 0.06}s">
+      <div class="featured-num">${String(i + 1).padStart(2, '0')}</div>
       <div class="featured-studio-loc">${s.city}, QC</div>
       <div class="featured-studio-name">${s.name.toUpperCase()}</div>
       <p class="featured-studio-desc">${s.desc}</p>
