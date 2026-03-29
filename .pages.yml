@@ -33,6 +33,17 @@ content:
             - Developer Spotlight
             - Events
             - News
+      - name: image
+        label: Featured Image
+        type: image
+      - name: image_alt
+        label: "Featured Image Alt Text"
+        type: string
+      - name: keywords
+        label: Keywords
+        type: array
+        items:
+          type: string
       - name: draft
         label: Draft
         type: boolean
