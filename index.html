@@ -376,6 +376,12 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 .blog-read-more:hover{opacity:.65;}
 .blog-read-more svg{transition:transform .2s;}
 .blog-read-more:hover svg{transform:translateX(4px);}
+.blog-back-btn{display:inline-flex;align-items:center;gap:8px;margin-bottom:32px;font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;padding:0;transition:color .2s;}
+.blog-back-btn:hover{color:var(--text);}
+.blog-post-full-body h2{font-family:var(--font-ui);font-size:20px;font-weight:700;margin:36px 0 12px;}
+.blog-post-full-body h3{font-family:var(--font-ui);font-size:16px;font-weight:700;margin:28px 0 8px;}
+.blog-post-full-body img{max-width:100%;height:auto;border-radius:8px;margin:16px 0;}
+.blog-post-full-body iframe{width:100%;aspect-ratio:16/9;border:none;border-radius:8px;margin:16px 0;}
 
 /* ═══════════════════════════════════════════
    JOBS PAGE
@@ -976,6 +982,31 @@ nav.nav-open .nav-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 /* ═══════════════════════════════════════
    BLOG RENDERING
 ═══════════════════════════════════════ */
+function parseFrontmatter(text) {
+  const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
+  if (!m) return { fm: {}, body: text };
+  const fm = {};
+  m[1].split('\n').forEach(line => {
+    const kv = line.match(/^([^:]+):\s*(.*)$/);
+    if (kv) fm[kv[1].trim()] = kv[2].trim().replace(/^["']|["']$/g, '');
+  });
+  return { fm, body: m[2].trim() };
+}
+
+function mdToHtml(md) {
+  return md
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;height:auto;border-radius:8px;margin:8px 0">')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .split(/\n\n+/)
+    .map(p => { p = p.trim(); return (!p || p.startsWith('<')) ? p : `<p>${p.replace(/\n/g, '<br>')}</p>`; })
+    .join('\n');
+}
+
 async function renderBlogPage() {
   const wrap = document.getElementById('blogPostsList');
   wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Loading posts…</p>';
@@ -998,11 +1029,38 @@ async function renderBlogPage() {
           <span>${p.author}</span>
         </div>
         <div class="blog-post-body"><p>${p.excerpt}</p></div>
-        <a class="blog-read-more" href="#">Read Full Post ${arrowSVG}</a>
+        <a class="blog-read-more" onclick="showBlogPost('${p.slug}')" style="cursor:pointer">Read Full Post ${arrowSVG}</a>
       </article>`).join('');
     observeReveal();
   } catch(e) {
     wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Could not load posts.</p>';
+  }
+}
+
+async function showBlogPost(slug) {
+  const wrap = document.getElementById('blogPostsList');
+  wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Loading…</p>';
+  try {
+    const res = await fetch(`_posts/${slug}.md`);
+    if (!res.ok) throw new Error('Not found');
+    const { fm, body } = parseFrontmatter(await res.text());
+    wrap.innerHTML = `
+      <button class="blog-back-btn" onclick="renderBlogPage()">← All Posts</button>
+      <article class="blog-post reveal">
+        <div class="blog-post-eyebrow">${fm.category || ''}</div>
+        <h2 class="blog-post-title">${fm.title || ''}</h2>
+        <div class="blog-post-meta">
+          <span>${fm.date || ''}</span>
+          <div class="blog-post-meta-dot"></div>
+          <span>${fm.author || ''}</span>
+        </div>
+        <div class="blog-post-body blog-post-full-body">${mdToHtml(body)}</div>
+      </article>`;
+    observeReveal();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(e) {
+    wrap.innerHTML = `<button class="blog-back-btn" onclick="renderBlogPage()">← All Posts</button>
+      <p style="color:var(--muted);padding:40px 0">Could not load post.</p>`;
   }
 }
 

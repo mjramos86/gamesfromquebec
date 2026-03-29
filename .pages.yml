@@ -40,6 +40,9 @@ content:
       - name: body
         label: Content
         type: rich-text
+        options:
+          switcher: true
+          extensions: [jpg, jpeg, png, webp, gif]
 
   - name: games
     label: Games
