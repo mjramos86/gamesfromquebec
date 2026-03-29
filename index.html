@@ -378,6 +378,10 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:60px
 .blog-read-more:hover svg{transform:translateX(4px);}
 .blog-back-btn{display:inline-flex;align-items:center;gap:8px;margin-bottom:32px;font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:none;background:none;cursor:pointer;padding:0;transition:color .2s;}
 .blog-back-btn:hover{color:var(--text);}
+.blog-post-hero{width:100%;height:220px;object-fit:cover;border-radius:8px;margin-bottom:24px;display:block;}
+.blog-post-hero-full{height:360px;}
+.blog-keywords{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;}
+.blog-keyword{font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:4px 10px;}
 .blog-post-full-body h2{font-family:var(--font-ui);font-size:20px;font-weight:700;margin:36px 0 12px;}
 .blog-post-full-body h3{font-family:var(--font-ui);font-size:16px;font-weight:700;margin:28px 0 8px;}
 .blog-post-full-body img{max-width:100%;height:auto;border-radius:8px;margin:16px 0;}
@@ -986,9 +990,24 @@ function parseFrontmatter(text) {
   const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
   if (!m) return { fm: {}, body: text };
   const fm = {};
+  let currentKey = null;
   m[1].split('\n').forEach(line => {
+    const listItem = line.match(/^\s+-\s+(.*)$/);
+    if (listItem && currentKey) {
+      if (!Array.isArray(fm[currentKey])) fm[currentKey] = [];
+      fm[currentKey].push(listItem[1].trim().replace(/^["']|["']$/g, ''));
+      return;
+    }
     const kv = line.match(/^([^:]+):\s*(.*)$/);
-    if (kv) fm[kv[1].trim()] = kv[2].trim().replace(/^["']|["']$/g, '');
+    if (kv) {
+      currentKey = kv[1].trim();
+      const val = kv[2].trim().replace(/^["']|["']$/g, '');
+      if (!val) { fm[currentKey] = null; }
+      else if (val.startsWith('[') && val.endsWith(']')) {
+        fm[currentKey] = val.slice(1,-1).split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+        currentKey = null;
+      } else { fm[currentKey] = val; currentKey = null; }
+    }
   });
   return { fm, body: m[2].trim() };
 }
@@ -1007,20 +1026,28 @@ function mdToHtml(md) {
     .join('\n');
 }
 
+let _blogPosts = [];
+
+function _kwTags(kws) {
+  if (!kws || !kws.length) return '';
+  return `<div class="blog-keywords">${kws.map(k => `<span class="blog-keyword">${k}</span>`).join('')}</div>`;
+}
+
 async function renderBlogPage() {
   const wrap = document.getElementById('blogPostsList');
   wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Loading posts…</p>';
   try {
     const res = await fetch('_posts/index.json');
     const posts = await res.json();
-    const visible = posts.filter(p => !p.draft);
-    if (!visible.length) {
+    _blogPosts = posts.filter(p => !p.draft);
+    if (!_blogPosts.length) {
       wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">No posts yet.</p>';
       return;
     }
     const arrowSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
-    wrap.innerHTML = visible.map((p, i) => `
+    wrap.innerHTML = _blogPosts.map((p, i) => `
       <article class="blog-post reveal" style="transition-delay:${i * 0.1}s">
+        ${p.image ? `<img class="blog-post-hero" src="${p.image}" alt="${p.image_alt || p.title}" loading="lazy">` : ''}
         <div class="blog-post-eyebrow">${p.category}</div>
         <h2 class="blog-post-title">${p.title}</h2>
         <div class="blog-post-meta">
@@ -1029,7 +1056,8 @@ async function renderBlogPage() {
           <span>${p.author}</span>
         </div>
         <div class="blog-post-body"><p>${p.excerpt}</p></div>
-        <a class="blog-read-more" onclick="showBlogPost('${p.slug}')" style="cursor:pointer">Read Full Post ${arrowSVG}</a>
+        ${_kwTags(p.keywords)}
+        <a class="blog-read-more" onclick="showBlogPost(${i})" style="cursor:pointer">Read Full Post ${arrowSVG}</a>
       </article>`).join('');
     observeReveal();
   } catch(e) {
@@ -1037,24 +1065,27 @@ async function renderBlogPage() {
   }
 }
 
-async function showBlogPost(slug) {
+async function showBlogPost(i) {
+  const p = _blogPosts[i];
   const wrap = document.getElementById('blogPostsList');
   wrap.innerHTML = '<p style="color:var(--muted);padding:40px 0">Loading…</p>';
   try {
-    const res = await fetch(`_posts/${slug}.md`);
+    const res = await fetch(`_posts/${p.slug}.md`);
     if (!res.ok) throw new Error('Not found');
-    const { fm, body } = parseFrontmatter(await res.text());
+    const { body } = parseFrontmatter(await res.text());
     wrap.innerHTML = `
       <button class="blog-back-btn" onclick="renderBlogPage()">← All Posts</button>
       <article class="blog-post reveal">
-        <div class="blog-post-eyebrow">${fm.category || ''}</div>
-        <h2 class="blog-post-title">${fm.title || ''}</h2>
+        ${p.image ? `<img class="blog-post-hero blog-post-hero-full" src="${p.image}" alt="${p.image_alt || p.title}">` : ''}
+        <div class="blog-post-eyebrow">${p.category}</div>
+        <h2 class="blog-post-title">${p.title}</h2>
         <div class="blog-post-meta">
-          <span>${fm.date || ''}</span>
+          <span>${p.date}</span>
           <div class="blog-post-meta-dot"></div>
-          <span>${fm.author || ''}</span>
+          <span>${p.author}</span>
         </div>
         <div class="blog-post-body blog-post-full-body">${mdToHtml(body)}</div>
+        ${_kwTags(p.keywords)}
       </article>`;
     observeReveal();
     window.scrollTo({ top: 0, behavior: 'smooth' });

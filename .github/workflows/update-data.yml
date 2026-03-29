@@ -91,6 +91,9 @@ jobs:
                   date_display = date.strftime('%B %-d, %Y')
               else:
                   date_display = str(date)
+              # Strip HTML tags for plain-text excerpt
+              import re as _re
+              plain_excerpt = _re.sub(r'<[^>]+>', '', first_para).strip()
               posts.append({
                   'slug': slug,
                   'title': fm.get('title', ''),
@@ -98,7 +101,10 @@ jobs:
                   'author': fm.get('author', ''),
                   'category': fm.get('category', ''),
                   'draft': fm.get('draft', False),
-                  'excerpt': first_para,
+                  'excerpt': plain_excerpt or first_para,
+                  'image': fm.get('image') or None,
+                  'image_alt': fm.get('image_alt', ''),
+                  'keywords': fm.get('keywords') or [],
               })
           with open('_posts/index.json', 'w', encoding='utf-8') as fh:
               json.dump(posts, fh, ensure_ascii=False, indent=2)
